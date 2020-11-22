@@ -17,3 +17,11 @@ aliases:
     - bozzo
     - floryut
     - eppo
+  containerOS-approvers:
+    - bbbmj
+    - WangMinjie114
+  containerOS-reviewers:
+    - bbbmj
+    - WangMinjie114
+    - liwandaniel
+    - hanxueluo

@@ -2,5 +2,7 @@
 
 approvers:
   - kubespray-approvers
+  - containerOS-approvers
 reviewers:
   - kubespray-reviewers
+  - containerOS-reviewers
