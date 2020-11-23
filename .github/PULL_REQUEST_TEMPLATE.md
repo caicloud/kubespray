@@ -1,44 +1,82 @@
-<!--  Thanks for sending a pull request!  Here are some tips for you:
-
-1. If this is your first time, please read our contributor guidelines: https://git.k8s.io/community/contributors/guide/first-contribution.md and developer guide https://git.k8s.io/community/contributors/devel/development.md
-2. Please label this pull request according to what type of issue you are addressing, especially if this is a release targeted pull request. For reference on required PR/issue labels, read here:
-https://git.k8s.io/community/contributors/devel/sig-release/release.md#issuepr-kind-label
-3. Ensure you have added or ran the appropriate tests for your PR: https://git.k8s.io/community/contributors/devel/sig-testing/testing.md
-4. If you want *faster* PR reviews, read how: https://git.k8s.io/community/contributors/guide/pull-requests.md#best-practices-for-faster-reviews
-5. Follow the instructions for writing a release note: https://git.k8s.io/community/contributors/guide/release-notes.md
-6. If the PR is unfinished, see how to mark it: https://git.k8s.io/community/contributors/guide/pull-requests.md#marking-unfinished-pull-requests
--->
+<!--  Thanks for sending a pull request! See below for tips! -->
 
 **What type of PR is this?**
-> Uncomment only one ` /kind <>` line, hit enter to put that in a new line, and remove leading whitespaces from that line:
->
-> /kind api-change
-> /kind bug
-> /kind cleanup
-> /kind design
-> /kind documentation
-> /kind failing-test
-> /kind feature
-> /kind flake
+
+<!--
+Add one or more of the following kinds:
+/kind api-change
+/kind bug
+/kind cleanup
+/kind deprecation
+/kind documentation
+/kind test
+/kind feature
+/kind regression
+/kind upgrade
+/kind denpendency
+
+Also with one of following areas:
+/area auth
+/area resource
+/area apps
+/area cicd
+/area cargo
+/area insight
+/area loadbalancer
+/area network
+/area release
+/area cli
+/area data
+/area serving
+/area workflow
+/area tutorial
+/area solution
+/area training
+/area model
+-->
 
 **What this PR does / why we need it**:
 
-**Which issue(s) this PR fixes**:
-<!--
-*Automatically closes linked issue when PR is merged.
-Usage: `Fixes #<issue number>`, or `Fixes (paste link of issue)`.
-_If PR is about `failing-tests or flakes`, please post the related issues/tests in a comment and do not use `Fixes`_*
--->
+**Which issue(s) this PR is related to** *(optional, link to 3rd issue(s))*:
+
 Fixes #
 
+Reference to #
+<!-- 填在 Fixes，PR 合并就会关 issue。填在 Reference to 会关联 issue，不会联动关闭。-->
+
 **Special notes for your reviewer**:
+
+/cc @your-reviewer
+
+<!-- Please answer the following questions during the code freeze, and delete this line.
+**Code freeze questions**
+
+1. What causes this PR to not be merged before code freeze?
+2. Why this PR is absolutely necessary for this version? Paste a screenshot of smoke testing docs if you could.
+3. What's the effects after merging it?
+4. Is there anyway we can skip this to not affect the overall process?
+-->
 
 **Does this PR introduce a user-facing change?**:
 <!--
 If no, just write "NONE" in the release-note block below.
 If yes, a release note is required:
 Enter your extended release note in the block below. If the PR requires additional action from users switching to the new release, include the string "action required".
+
+For more information on release notes see: https://git.k8s.io/community/contributors/guide/release-notes.md
 -->
 ```release-note
 
 ```
+
+<!--  Thanks for sending a pull request! Here are some tips:
+
+1. https://github.com/caicloud/engineering/blob/master/guidelines/review_conventions.md      <-- what is the review process looks like
+2. https://github.com/caicloud/engineering/blob/master/guidelines/git_commit_conventions.md  <-- how to structure your git commit
+3. https://github.com/caicloud/engineering/blob/master/guidelines/caicloud_bot.md            <-- how to work with caicloud bot
+
+Other tips:
+
+If this is your first contribution, read our Getting Started guide https://github.com/caicloud/engineering/blob/master/guidelines/README.md
+-->
+ 
