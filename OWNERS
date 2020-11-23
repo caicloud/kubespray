@@ -1,8 +1,10 @@
 # See the OWNERS docs at https://go.k8s.io/owners
 
 approvers:
-  - kubespray-approvers
-  - containerOS-approvers
+  - bbbmj
+  - WangMinjie114
 reviewers:
-  - kubespray-reviewers
-  - containerOS-reviewers
+  - bbbmj
+  - WangMinjie114
+  - liwandaniel
+  - hanxueluo
