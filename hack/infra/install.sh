@@ -3,9 +3,6 @@
 set -o nounset
 umask 0022
 
-# Assumed vars:
-#
-
 ### Color setting
 RED_COL="\\033[1;31m"           # red color
 GREEN_COL="\\033[32;1m"         # green color
@@ -20,7 +17,7 @@ COMPASS_DEPLOY_DIR=$(cd ${INFRA_ROOT} && cd .. && pwd -P)
 COMMON_ROOT=${COMPASS_DEPLOY_DIR}/common
 COMMON_MIRROR_DIR=${COMMON_ROOT}/all-in-one/mirrors
 INFRA_NGINX_LOG_FILE="/var/log/infra.log"
-INFR_CONTAINERD_NAME="cabin-nginx"
+INFRA_CONTAINERD_NAME="infra-nginx"
 
 echo -e "$GREEN_COL Check system version $NORMAL_COL"
 # get system version
@@ -76,33 +73,31 @@ sed -i "s|__BASE__|$COMMON_MIRROR_DIR|g" /etc/yum.repos.d/CentOS-8-All-In-One.re
 yum clean all && yum makecache
 
 # Install containerd
-## This package from https://github.com/containerd/containerd/releases/tag/v1.4.1
-tar xvf ${COMMON_MIRROR_DIR}/runtime/containerd/cri-containerd-cni-1.4.1-linux-amd64.tar.gz -C /
-systemctl daemon-reload
+yum install -y containerd.io-1.4.1
 systemctl restart containerd
 systemctl enable containerd
 
 ## TODO：Check containerd status
 
 # Load images
-find /compass/infra-centos8.2-kubev1.19.3/resources/images/save -name '*.tar.gz' -type f | xargs -I {} ctr i import {}
-CABIN_NGINX_VERSION=`ctr i ls | grep cabin-nginx | cut -d " " -f 1`
+find ${INFRA_ROOT}/resources/images/save -name '*.tar.gz' -type f | xargs -I {} ctr i import {}
+CABIN_NGINX_IMAGE=`ctr i ls | grep ${INFRA_CONTAINERD_NAME} | cut -d " " -f 1`
 
-# Start cabin-nginx
-if `ctr tasks ls | grep cabin-nginx`; then
-  ctr tasks kill cabin-nginx >/dev/null 2>&1 || true
-  ctr tasks rm cabin-nginx >/dev/null 2>&1 || true
+# Start infra-nginx
+if `ctr tasks ls | grep -Eqi ${INFRA_CONTAINERD_NAME}`; then
+  ctr tasks kill ${INFRA_CONTAINERD_NAME} >/dev/null 2>&1 || true
+  ctr tasks rm ${INFRA_CONTAINERD_NAME} >/dev/null 2>&1 || true
 fi
-if `ctr snapshots ls | grep cabin-nginx`; then
-  ctr snapshots rm cabin-nginx >/dev/null 2>&1 || true
+if `ctr snapshot ls | grep -Eqi ${INFRA_CONTAINERD_NAME}`; then
+  ctr snapshot rm ${INFRA_CONTAINERD_NAME} >/dev/null 2>&1 || true
 fi
-if `ctr container ls | grep cabin-nginx`; then
-  ctr container rm cabin-nginx >/dev/null 2>&1 || true
+if `ctr container ls | grep -Eqi ${INFRA_CONTAINERD_NAME}`; then
+  ctr container rm ${INFRA_CONTAINERD_NAME} >/dev/null 2>&1 || true
 fi
-ctr run -t -d --net-host \
+ctr run -d --net-host \
   --log-uri file://${INFRA_NGINX_LOG_FILE} \
   --mount type=bind,src=${COMMON_MIRROR_DIR},dst=/usr/share/nginx/html,options=rbind:r \
-  ${CABIN_NGINX_VERSION} ${INFR_CONTAINERD_NAME}
+  ${CABIN_NGINX_IMAGE} ${INFRA_CONTAINERD_NAME}
 
 ## Check infra package installation..
 while true;do
