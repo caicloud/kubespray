@@ -4,9 +4,6 @@
 set -o nounset
 umask 0022
 
-# Assumed vars:
-#
-
 ### Color setting
 RED_COL="\\033[1;31m"           # red color
 GREEN_COL="\\033[32;1m"         # green color
@@ -25,10 +22,6 @@ else
 fi
 
 CONTAINERD_VERSION="1.4.1"
-CONTAINERD_ARCH="amd64"
-CONTAINERD_PACKAGE_NAME="cri-containerd-cni-${CONTAINERD_VERSION}-linux-${CONTAINERD_ARCH}.tar.gz"
-## This package from https://github.com/containerd/containerd/releases/tag/v1.4.1
-CONTAINERD_DOWNLOAD_URL="${DOWNLOAD_URL}/runtime/containerd/${CONTAINERD_PACKAGE_NAME}"
 
 echo -e "$GREEN_COL Check system version $NORMAL_COL"
 # get system version
@@ -46,6 +39,16 @@ if [[ ${RELEASE} == '' ]]; then
     echo -e "$RED_COL Can not get system message, please check $NORMAL_COL"
     exit 1
 fi
+
+# Stop firewalld
+echo -e "$GREEN_COL Stop firewalld $NORMAL_COL"
+systemctl stop firewalld
+systemctl disable firewalld
+
+# Disable selinux
+echo -e "$GREEN_COL Disable selinux $NORMAL_COL"
+sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config || echo -e "$YELLOW_COL Warning: Modifying /etc/selinux/config failed $NORMAL_COL"
+setenforce 0 || echo "$YELLOW_COL Warning: setenforce 0 failed"
 
 # check containerd install or uninstall
 systemctl status containerd.service >> /dev/null 2>&1
@@ -74,30 +77,11 @@ fi
 sed -i "s#__download_url__#${DOWNLOAD_URL}#g" /etc/yum.repos.d/CentOS-8-All-In-One.repo
 yum clean all && yum makecache
 
-# Stop firewalld
-echo -e "$GREEN_COL Stop firewalld $NORMAL_COL"
-systemctl stop firewalld
-systemctl disable firewalld
-
-# Disable selinux
-echo -e "$GREEN_COL Disable selinux $NORMAL_COL"
-sed -i 's/SELINUX=enforcing/SELINUX=permissive/g' /etc/selinux/config || echo -e "$YELLOW_COL Warning: Modifying /etc/selinux/config failed $NORMAL_COL"
-setenforce 0 || echo "$YELLOW_COL Warning: setenforce 0 failed"
-
 # Install containerd
 echo -e "$GREEN_COL Start install containerd $NORMAL_COL"
-curl ${CONTAINERD_DOWNLOAD_URL} -o ${CONTAINERD_PACKAGE_NAME} || wget ${CONTAINERD_DOWNLOAD_URL} -O ./${CONTAINERD_PACKAGE_NAME}
-if [[ $? -ne 0 ]]; then
-    echo -e "$RED_COL download yum repo config error, Please check download_ip !! $NORMAL_COL"
-    exit 1
-fi
-tar xvf ${CONTAINERD_PACKAGE_NAME} -C / >/dev/null 2>&1
-systemctl daemon-reload
+yum install -y containerd.io-${CONTAINERD_VERSION}
 
 # Start containerd
 echo -e "$GREEN_COL Starting containerd $NORMAL_COL"
 systemctl restart containerd
 systemctl enable containerd
-
-# Clean containerd package
-rm -f ./${CONTAINERD_PACKAGE_NAME}
