@@ -93,7 +93,7 @@
 
 - name: Master | wait for kube-scheduler
   uri:
-    url: https://localhost:10259/healthz
+    url: "https://{{ kube_scheduler_bind_address }}:10259/healthz"
     validate_certs: no
   register: scheduler_result
   until: scheduler_result.status == 200
@@ -102,7 +102,7 @@
 
 - name: Master | wait for kube-controller-manager
   uri:
-    url: https://localhost:10257/healthz
+    url: "https://{{ kube_controller_manager_bind_address }}:10257/healthz"
     validate_certs: no
   register: controller_manager_result
   until: controller_manager_result.status == 200

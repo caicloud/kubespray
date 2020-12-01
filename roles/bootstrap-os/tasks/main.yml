@@ -46,8 +46,10 @@
     filter: ansible_*
 
 - name: Assign inventory name to unconfigured hostnames (non-CoreOS, non-Flatcar, Suse and ClearLinux)
-  hostname:
-    name: "{{ inventory_hostname }}"
+  block:
+    - shell: "echo {{ inventory_hostname }} > /etc/hostname"
+    - hostname:
+        name: "{{ inventory_hostname }}"
   when:
     - override_system_hostname
     - ansible_os_family not in ['Suse', 'Flatcar Container Linux by Kinvolk', 'ClearLinux'] and not is_fedora_coreos

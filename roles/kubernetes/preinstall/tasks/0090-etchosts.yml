@@ -24,6 +24,16 @@
     marker: "# Ansible inventory hosts {mark}"
   when: populate_inventory_to_hosts_file
 
+- name: Hosts | populate inventory into hosts file
+  blockinfile:
+    path: /etc/hosts
+    block: "{{ cargo_ip }} {{ cargo_domain }}"
+    state: present
+    create: yes
+    backup: yes
+    unsafe_writes: yes
+    marker: "# Cargo server {mark}"
+
 - name: Hosts | populate kubernetes loadbalancer address into hosts file
   lineinfile:
     dest: /etc/hosts
