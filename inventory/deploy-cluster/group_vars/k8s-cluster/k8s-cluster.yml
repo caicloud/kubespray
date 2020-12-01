@@ -20,16 +20,27 @@ kube_users_dir: "{{ kube_config_dir }}/users"
 kube_api_anonymous_auth: true
 
 ## Change this to use another Kubernetes version, e.g. a current beta release
-kube_version: v1.18.10
+kube_version: v1.19.3
 
-# kubernetes image repo define
-kube_image_repo: "k8s.gcr.io"
+# cargo domain config
+cargo_domain: "devops.cargo.io"
+cargo_object: "cluster-deploy"
+
+# gcr and kubernetes image repo define
+gcr_image_repo: "{{ cargo_domain }}/{{ cargo_object }}"
+kube_image_repo: "{{ cargo_domain }}/{{ cargo_object }}"
+
+# docker image repo define
+docker_image_repo: "{{ cargo_domain }}/{{ cargo_object }}"
+
+# quay image repo define
+quay_image_repo: "{{ cargo_domain }}/{{ cargo_object }}"
 
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
 local_release_dir: "/tmp/releases"
 # Random shifts for retrying failed ops like pushing/downloading
-retry_stagger: 5
+retry_stagger: 10
 
 # This is the group that the cert creation scripts chgrp the
 # cert files to. Not really changeable...
@@ -133,7 +144,7 @@ kube_proxy_nodeport_addresses: >-
 #   {%- endif -%}
 
 ## Encrypting Secret Data at Rest (experimental)
-kube_encrypt_secret_data: false
+kube_encrypt_secret_data: true
 
 # DNS configuration.
 # Kubernetes cluster name, also will be used as DNS domain
@@ -145,7 +156,7 @@ dns_mode: coredns
 # Set manual server if using a custom cluster DNS server
 # manual_dns_server: 10.x.x.x
 # Enable nodelocal dns cache
-enable_nodelocaldns: true
+enable_nodelocaldns: false
 nodelocaldns_ip: 169.254.25.10
 nodelocaldns_health_port: 9254
 # nodelocaldns_external_zones:
@@ -178,7 +189,7 @@ dns_domain: "{{ cluster_name }}"
 
 ## Container runtime
 ## docker for docker, crio for cri-o and containerd for containerd.
-container_manager: docker
+container_manager: containerd
 
 # Additional container runtimes
 kata_containers_enabled: false
@@ -221,7 +232,7 @@ kubeadm_certificate_key: "{{ lookup('password', credentials_dir + '/kubeadm_cert
 k8s_image_pull_policy: IfNotPresent
 
 # audit log for kubernetes
-kubernetes_audit: false
+kubernetes_audit: true
 
 # dynamic kubelet configuration
 dynamic_kubelet_configuration: false
@@ -325,3 +336,18 @@ event_ttl_duration: "1h0m0s"
 ## Set dns record to resolve registry domain name
 dns_etchosts: "{{ registry_ip }} {{ registry_domain }}"
 
+
+## Kubeadm config for compass OEM
+## This vars copy from roles/kubernetes/master/defaults/main/main.yml
+### kubernetes adminssion plugins
+kube_apiserver_enable_admission_plugins:
+  - NodeRestriction
+  - DenyEscalatingExec
+  - AlwaysPullImages
+#  - PodSecurityPolicy
+#  - EventRateLimit
+
+### Set k8s component bind host address
+kube_apiserver_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
+kube_controller_manager_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
+kube_scheduler_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
