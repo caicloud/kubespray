@@ -13,8 +13,8 @@ NORMAL_COL="\\033[0;39m"
 INFRA_ROOT=$(cd $(dirname "${BASH_SOURCE}")/ && pwd -P)
 INFRA_FILE_DIR=$INFRA_ROOT/resources/files
 DIRECTORY_NAME=$(basename "${INFRA_ROOT}")
-COMPASS_DEPLOY_DIR=$(cd ${INFRA_ROOT} && cd .. && pwd -P)
-COMMON_ROOT=${COMPASS_DEPLOY_DIR}/common
+PRODUCT_DEPLOY_DIR=$(cd ${INFRA_ROOT} && cd .. && pwd -P)
+COMMON_ROOT=${PRODUCT_DEPLOY_DIR}/common
 COMMON_MIRROR_DIR=${COMMON_ROOT}/all-in-one/mirrors
 INFRA_NGINX_LOG_FILE="/var/log/infra.log"
 INFRA_CONTAINERD_NAME="infra-nginx"
@@ -44,8 +44,8 @@ fi
 echo -e "$GREEN_COL Start installing infra package... $NORMAL_COL"
 
 # Create dependence directory
-mkdir -p ${COMPASS_DEPLOY_DIR}/common/all-in-one/mirrors
-mkdir -p ${COMPASS_DEPLOY_DIR}/common/containerd
+mkdir -p ${PRODUCT_DEPLOY_DIR}/common/all-in-one/mirrors
+mkdir -p ${PRODUCT_DEPLOY_DIR}/common/containerd
 
 # Stop firewalld
 echo -e "$GREEN_COL Stop firewalld $NORMAL_COL"
