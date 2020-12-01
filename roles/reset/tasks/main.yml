@@ -77,7 +77,9 @@
   tags:
     - crio
     - containerd
-  when: container_manager in ["crio", "containerd"]
+  when:
+    - container_manager in ["crio", "containerd"]
+    - inventory_hostname in groups['kube-node'] or inventory_hostname in groups['kube-master']
 
 - name: reset | remove all cri containers
   shell: "set -o pipefail && crictl ps -aq | xargs -r crictl -t 60s rm"
@@ -90,7 +92,9 @@
   tags:
     - crio
     - containerd
-  when: container_manager in ["crio", "containerd"] and deploy_container_engine|default(true)
+  when: 
+    - container_manager in ["crio", "containerd"] and deploy_container_engine|default(true)
+    - inventory_hostname in groups['kube-node'] or inventory_hostname in groups['kube-master']
 
 - name: reset | stop all cri pods
   shell: "set -o pipefail && crictl pods -q | xargs -r crictl -t 60s stopp"
@@ -103,7 +107,9 @@
   tags:
     - crio
     - containerd
-  when: container_manager in ["crio", "containerd"]
+  when:
+    - container_manager in ["crio", "containerd"]
+    - inventory_hostname in groups['kube-node'] or inventory_hostname in groups['kube-master']
 
 - name: reset | remove all cri pods
   shell: "set -o pipefail && crictl pods -q | xargs -r crictl -t 60s rmp"
@@ -116,7 +122,9 @@
   tags:
     - crio
     - containerd
-  when: container_manager in ["crio", "containerd"]
+  when:
+    - container_manager in ["crio", "containerd"]
+    - inventory_hostname in groups['kube-node'] or inventory_hostname in groups['kube-master']
 
 - name: reset | stop etcd services
   service:
@@ -159,6 +167,39 @@
   delay: 5
   tags:
     - mounts
+
+- name: Find all mounted volumes of pods
+  command: "awk '$2 ~ path {print $2}' path=/var/lib/kubelet/ /proc/mounts"
+  register: volumes
+  tags:
+    - unmounts
+
+- name: Unmount all mounted volumes of pods
+  mount:
+    path: "{{ item }}"
+    state: unmounted
+  with_items: "{{ volumes.stdout_lines }}"
+  ignore_errors: True
+  tags:
+    - unmounts
+
+- name: Ensure all files under the working dir doesn't exist
+  block:
+    - name: List all files under the dir
+      find:
+        paths: "/var/lib/kubelet"
+        file_type: any
+        hidden: yes
+      register: deleting_files
+
+    - name: Delete files under the dir
+      file:
+        path: "{{ item.path }}"
+        state: absent
+      with_items: "{{ deleting_files.files }}"
+  ignore_errors: True
+  tags:
+    - unmounts
 
 - name: flush iptables
   iptables:
@@ -318,3 +359,9 @@
   tags:
     - services
     - network
+
+- name: reset | Restart containerd
+  service:
+    name: containerd
+    state: restarted
+  when: container_manager == "containerd" and containerd_version is version('1.4', '>=')
