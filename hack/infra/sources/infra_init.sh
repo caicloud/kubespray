@@ -1,5 +1,5 @@
 #!/bin/bash
-## FileName: install_containerd.sh
+## FileName: infra_init.sh
 
 set -o nounset
 umask 0022
