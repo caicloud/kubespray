@@ -1,0 +1,154 @@
+# Ensure COS namespaces exist
+- name: Ensure COS namespaces exist
+  shell: |
+    kubectl get ns | grep {{ cos_running_namespaces }} || kubectl create namespace {{ cos_running_namespaces }}
+  when:
+    - cos_running_namespaces not in ["default", "kube-system"]
+  run_once: true
+
+# Ensure self-hosted config dir exist
+- name: Ensure self-hosted config dir exist
+  file:
+    path: "{{ self_hosted_config_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0o755
+
+# Add cargo dns resolve to coredns
+- name: Add cargo dns resolve
+  shell:
+    cmd:
+      "kubectl -n kube-system patch cm coredns --patch '{\"data\": {\"hosts\": \"192.168.21.97 devops.cargo.io\\n\"}}'"
+  run_once: true
+
+# Read ssh certs and create secret
+- name: Read ssh private key
+  slurp:
+    src: "{{ ssh_certs_path }}/id_rsa"
+  register: ssh_key_id_rsa
+  delegate_to: localhost
+
+- name: Read ssh public key
+  slurp:
+    src: "{{ ssh_certs_path }}/id_rsa.pub"
+  register: ssh_key_id_rsa_pub
+  delegate_to: localhost
+
+- name: Generate ssh key secret
+  template:
+    src: ssh_secret.yml.j2
+    dest: "{{ self_hosted_config_dir }}/ssh_secret.yml"
+  run_once: true
+
+- name: Create secret for ssh identification
+  shell: |
+    kubectl apply -f {{ self_hosted_config_dir }}/ssh_secret.yml
+  run_once: true
+
+- name: Copy cargo cert to master node
+  copy:
+    src: "{{ cargo_signed_certificate }}"
+    dest: "{{ kube_config_dir }}/cargo-ca.crt"
+  when: cargo_ca_self_sign
+
+- name: Create secret for cargo ca cert
+  shell: |
+    kubectl -n {{ cos_running_namespaces }} create secret generic cargo-ca-cert --from-file={{ kube_config_dir }}/cargo-ca.crt
+  when: cargo_ca_self_sign
+  run_once: true
+
+- name: Create empty secret for cargo ca cert
+  shell: |
+    kubectl -n {{ cos_running_namespaces }} create secret generic cargo-ca-cert
+  when: not cargo_ca_self_sign
+  run_once: true
+
+# Fetch the kubeconfig file from cluster master node
+- name: Fetch kubeconfig from master
+  fetch:
+    src: "/root/.kube/config"
+    dest: "{{ local_kubeconfig_file }}"
+    flat: true
+    validate_checksum: no
+  run_once: true
+
+- name: Read kubeconfig file
+  include_vars:
+    file: "{{ local_kubeconfig_file }}"
+  register: kubeConfigFile
+  run_once: true
+
+# Create system-info, cluster-config-info configmap
+- name: Generate system-info config map
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ kube_config_dir }}/{{ item }}"
+  with_items:
+    - system-info-cm.yml
+    - cluster-config-info-cm.yml
+  when: g_deploy_caicloud_stack
+  run_once: true
+
+- name: Apply cm system-info to cluster
+  kube:
+    name: "{{ item.name }}"
+    kubectl: "{{ bin_dir }}/kubectl"
+    resource: "{{ item.type }}"
+    filename: "{{ kube_config_dir }}/{{ item.file }}"
+    state: "latest"
+  with_items:
+    - name: system-info
+      type: cm
+      file: system-info-cm.yml
+    - name: cluster-config-info
+      type: cm
+      file: cluster-config-info-cm.yml
+  run_once: true
+  when: g_deploy_caicloud_stack
+
+# Create cluster-info configmap
+- name: Generate cluster-info config map
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ kube_config_dir }}/{{ item }}"
+  with_items:
+    - cluster-info-cm.yml
+  run_once: true
+
+- name: Apply cm cluster-info to cluster
+  kube:
+    name: "{{ item.name }}"
+    kubectl: "{{ bin_dir }}/kubectl"
+    resource: "{{ item.type }}"
+    filename: "{{ kube_config_dir }}/{{ item.file }}"
+    state: "latest"
+  with_items:
+    - name: cluster-info
+      type: cm
+      file: cluster-info-cm.yml
+  run_once: true
+
+# # Create VIP
+# - name: Create VIP
+#   import_tasks: install_keepalived.yml
+#   when: not g_deploy_caicloud_stack
+
+- name: Generate cluster crd
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ kube_config_dir }}/{{ item }}"
+  with_items:
+    - cluster-crd-patch.yml
+  run_once: true
+  when: not g_deploy_caicloud_stack
+
+# TODO: Modify kube.py, support kubectl patch
+- name: Upgrade {{ cluster_identity_name }} cluster cr message
+  shell: |
+    kubectl -n {{ cos_running_namespaces }} patch cluster {{ cluster_identity_name }} -p "$(cat {{ kube_config_dir }}/{{ item }})"
+  with_items:
+    - cluster-crd-patch.yml
+  run_once: true
+  when: not g_deploy_caicloud_stack
+

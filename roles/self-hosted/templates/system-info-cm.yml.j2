@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ system_info_cm_name }}"
+  namespace: "{{ cos_running_namespaces }}"
+data:
+  clusterDeployVersion: ""
+  downloadURL: "{{ download_url }}"
+  # registry and cargo info
+  cargoIP: "{{ cargo_ip }}"
+  cargoName: "{{ cargo_domain }}"
+  ntpServer: "{{ ntp_server_address }}"

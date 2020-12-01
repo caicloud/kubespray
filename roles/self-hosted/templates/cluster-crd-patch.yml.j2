@@ -1,0 +1,27 @@
+apiVersion: resource.containeros.dev/v1alpha1
+kind: Cluster
+metadata:
+  name: "{{ cluster_identity_name }}"
+  namespace: "{{ cos_running_namespaces }}"
+spec:
+  auth:
+    kubeConfig: |
+      apiVersion: "{{ kubeConfigFile['ansible_facts']['apiVersion'] }}"
+      clusters:
+      - cluster:
+          certificate-authority-data: {{ kubeConfigFile['ansible_facts']['clusters'][0]['cluster']['certificate-authority-data'] }}
+          server: {{ kubeConfigFile['ansible_facts']['clusters'][0]['cluster']['server'] }}
+        name: {{ kubeConfigFile['ansible_facts']['clusters'][0]['name'] }}
+      contexts:
+      - context:
+          cluster: {{ kubeConfigFile['ansible_facts']['contexts'][0]['context']['cluster'] }}
+          user: {{ kubeConfigFile['ansible_facts']['contexts'][0]['context']['user'] }}
+        name: {{ kubeConfigFile['ansible_facts']['contexts'][0]['name'] }}
+      current-context: {{ kubeConfigFile['ansible_facts']['current-context'] }}
+      kind: {{ kubeConfigFile['ansible_facts']['kind'] }}
+      preferences: {{ kubeConfigFile['ansible_facts']['preferences'] }}
+      users:
+      - name: {{ kubeConfigFile['ansible_facts']['users'][0]['name'] }}
+        user:
+          client-certificate-data: {{ kubeConfigFile['ansible_facts']['users'][0]['user']['client-certificate-data'] }}
+          client-key-data: {{ kubeConfigFile['ansible_facts']['users'][0]['user']['client-key-data'] }}

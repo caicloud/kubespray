@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-config-info
+  namespace: {{ cos_running_namespaces }}
+data:
+  cluster: |
+    clusterName: "{{ cluster_identity_name }}"
+    clusterDnsDomain: "{{ cluster_name }}"
+    endpointIP: "{{ cluster_vip }}"
+    endpointPort: "{{ kube_apiserver_port }}"
+    kubeconfig:
+      apiVersion: "{{ kubeConfigFile['ansible_facts']['apiVersion'] }}"
+      clusters:
+      - cluster:
+          certificate-authority-data: {{ kubeConfigFile['ansible_facts']['clusters'][0]['cluster']['certificate-authority-data'] }}
+          server: {{ kubeConfigFile['ansible_facts']['clusters'][0]['cluster']['server'] }}
+        name: {{ kubeConfigFile['ansible_facts']['clusters'][0]['name'] }}
+      contexts:
+      - context:
+          cluster: {{ kubeConfigFile['ansible_facts']['contexts'][0]['context']['cluster'] }}
+          user: {{ kubeConfigFile['ansible_facts']['contexts'][0]['context']['user'] }}
+        name: {{ kubeConfigFile['ansible_facts']['contexts'][0]['name'] }}
+      current-context: {{ kubeConfigFile['ansible_facts']['current-context'] }}
+      kind: {{ kubeConfigFile['ansible_facts']['kind'] }}
+      preferences: {{ kubeConfigFile['ansible_facts']['preferences'] }}
+      users:
+      - name: {{ kubeConfigFile['ansible_facts']['users'][0]['name'] }}
+        user:
+          client-certificate-data: {{ kubeConfigFile['ansible_facts']['users'][0]['user']['client-certificate-data'] }}
+          client-key-data: {{ kubeConfigFile['ansible_facts']['users'][0]['user']['client-key-data'] }}
+{% if is_control_cluster %}
+    isControlCluster: true
+{% else %}
+    isControlCluster: false
+{% endif %}
+{% if groups['kube-master'] | length > 1 %}
+    isHighAvailable: true
+{% else %}
+    isHighAvailable: false
+{% endif %}
+    clusterSets:
+      k8s_custom: false
+  machine: |
+{% for hostname in ansible_play_hosts %}
+    {{ hostname }}:
+      address: {{ hostvars[hostname]['ansible_host'] }}
+      auth:
+        key: "login-config-ssh-global"
+        user: {{ hostvars[hostname]['ansible_user'] }}
+        port: {{ ansible_port }}
+      isEtcd: {{ hostname in groups['etcd'] | lower }}
+      isMaster: {{ hostname in groups['kube-master'] | lower }}
+{% endfor %}

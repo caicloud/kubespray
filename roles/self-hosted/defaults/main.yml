@@ -1,0 +1,32 @@
+# The var defines cluster deploy config file
+config_dir: "/kubespray/config-file/"
+
+# The var defines system info configmap name
+system_info_cm_name: "system-info"
+
+cluster_info_cm_name: "cluster-info"
+
+# Config ntp server ipaddress
+ntp_server: ""
+ntp_server_address: "{% if ntp_server %}{{ ntp_server }}{% else %}{{ cargo_ip }}{% endif %}"
+
+# The var defines cluster info configmap name
+is_control_cluster: true
+
+# The var defines the namespaces for COS
+cos_running_namespaces: "cos-system"
+
+# Local config path.
+# if cluster-deploy-job is running in cluster as a job, this dir is read only.
+local_config_path: "/kubespray/config"
+
+local_kubeconfig_file: "{{ local_config_path }}/kubectl.kubeconfig"
+
+# The var defines the ssh certs directory path. The ssh certs file name must is "id_rsa.pub" and "id_rsa"
+ssh_certs_path: "{{ local_config_path }}/ssh_cert"
+
+cluster_vip: ""
+
+self_hosted_config_dir: "/etc/kubernetes/self_hosted"
+
+cluster_identity_name: "ContainerOS-stack"
