@@ -20,6 +20,7 @@ vagrant/
 inventory/*
 !inventory/local
 !inventory/sample
+!inventory/deploy-cluster
 inventory/*/artifacts/
 
 # Byte-compiled / optimized / DLL files
