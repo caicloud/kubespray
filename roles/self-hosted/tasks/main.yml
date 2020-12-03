@@ -80,7 +80,7 @@
   with_items:
     - system-info-cm.yml
     - cluster-config-info-cm.yml
-  when: g_deploy_control_cluster
+  when: deploy_control_cluster
   run_once: true
 
 - name: Apply cm system-info to cluster
@@ -98,7 +98,7 @@
       type: cm
       file: cluster-config-info-cm.yml
   run_once: true
-  when: g_deploy_control_cluster
+  when: deploy_control_cluster
 
 # Create cluster-info configmap
 - name: Generate cluster-info config map
@@ -125,7 +125,7 @@
 # # Create VIP
 # - name: Create VIP
 #   import_tasks: install_keepalived.yml
-#   when: not g_deploy_control_cluster
+#   when: not deploy_control_cluster
 
 - name: Generate cluster crd
   template:
@@ -134,7 +134,7 @@
   with_items:
     - cluster-crd-patch.yml
   run_once: true
-  when: not g_deploy_control_cluster
+  when: not deploy_control_cluster
 
 # TODO: Modify kube.py, support kubectl patch
 - name: Upgrade {{ cluster_identity_name }} cluster cr message
@@ -143,5 +143,5 @@
   with_items:
     - cluster-crd-patch.yml
   run_once: true
-  when: not g_deploy_control_cluster
+  when: not deploy_control_cluster
 
