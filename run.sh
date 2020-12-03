@@ -28,7 +28,7 @@ cp -f ${CONFIG_PATH}/env.yml ${INVENTORY_PATH}/env.yml
 cp -f ${CONFIG_PATH}/inventory ${INVENTORY_PATH}/inventory
 
 case $input in
-  install-gpu )
+  init-machine )
 # TODO: add gpu device install
     exit 0
     ;;
