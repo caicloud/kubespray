@@ -7,5 +7,10 @@
     resource: "{{ item.item.type }}"
     filename: "{{ kube_config_dir }}/{{ item.item.file }}"
     state: "latest"
+    wait: true
+  register: result
+  until: result is success
+  retries: 5
+  delay: 2
   with_items: "{{ multus_manifest_1.results }} + {{ multus_manifest_2.results }}"
   when: inventory_hostname == groups['kube-master'][0] and not item is skipped

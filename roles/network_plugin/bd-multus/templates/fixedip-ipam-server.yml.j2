@@ -1,0 +1,82 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: fixedip-ipam-server
+  namespace: kube-system
+spec:
+  replicas: 1
+  strategy:
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: fixedip-ipam-server
+  template:
+    metadata:
+      labels:
+        app: fixedip-ipam-server
+    spec:
+      containers:
+        - env:
+            - name: IPAM_LISTEN_PORT
+              value: "{{ fixedip_ipam_server_port }}"
+          image: {{ fixedip_ipam_server_image_repo }}:{{ fixedip_ipam_server_image_tag }}
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz?type=liveness
+              port: {{ fixedip_ipam_server_port }}
+              scheme: HTTP
+            initialDelaySeconds: 120
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: fixedip-ipam-server
+          ports:
+            - containerPort: {{ fixedip_ipam_server_port }}
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /healthz?type=readiness
+              port: {{ fixedip_ipam_server_port }}
+              scheme: HTTP
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 300m
+              memory: 500Mi
+            requests:
+              cpu: 50m
+              memory: 200Mi
+      hostNetwork: true
+      nodeSelector:
+        caicloud.io/role: master
+      priorityClassName: system-cluster-critical
+      serviceAccount: fixedip-ipam
+      serviceAccountName: fixedip-ipam
+      terminationGracePeriodSeconds: 5
+      tolerations:
+        - effect: NoSchedule
+          operator: Exists
+        - effect: NoExecute
+          operator: Exists
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fixedip-ipam-server
+  namespace: kube-system
+spec:
+  type: NodePort
+  selector:
+    app: fixedip-ipam-server
+  ports:
+    - port: 8080
+      protocol: TCP
+      targetPort: {{ fixedip_ipam_server_port }}
