@@ -3,7 +3,7 @@
   shell: |
     kubectl get ns | grep {{ cos_running_namespaces }} || kubectl create namespace {{ cos_running_namespaces }}
   when:
-    - cos_running_namespaces not in ["default", "kube-system"]
+    - cos_running_namespaces not in ["default", "kube-system", "kube-node-lease", "kube-public"]
   run_once: true
 
 # Ensure self-hosted config dir exist
