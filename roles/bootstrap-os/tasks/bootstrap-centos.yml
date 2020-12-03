@@ -58,7 +58,7 @@
     - containeros_cluster == true
 
 ## 2/3 Config infra mirrors
-- name: Config compass infra mirrors
+- name: Config infra mirrors
   get_url:
     url: "{{ download_url }}/sources/CentOS-8-All-In-One.repo"
     dest: /etc/yum.repos.d/CentOS-8-All-In-One.repo
