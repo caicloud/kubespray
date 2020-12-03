@@ -22,19 +22,19 @@ kube_api_anonymous_auth: true
 ## Change this to use another Kubernetes version, e.g. a current beta release
 kube_version: v1.19.3
 
-# cargo domain config
-cargo_domain: "devops.cargo.io"
-cargo_object: "cluster-deploy"
+# registry domain config
+registry_domain: ""
+registry_project: "cluster-deploy"
 
 # gcr and kubernetes image repo define
-gcr_image_repo: "{{ cargo_domain }}/{{ cargo_object }}"
-kube_image_repo: "{{ cargo_domain }}/{{ cargo_object }}"
+gcr_image_repo: "{{ registry_domain }}/{{ registry_project }}"
+kube_image_repo: "{{ registry_domain }}/{{ registry_project }}"
 
 # docker image repo define
-docker_image_repo: "{{ cargo_domain }}/{{ cargo_object }}"
+docker_image_repo: "{{ registry_domain }}/{{ registry_project }}"
 
 # quay image repo define
-quay_image_repo: "{{ cargo_domain }}/{{ cargo_object }}"
+quay_image_repo: "{{ registry_domain }}/{{ registry_project }}"
 
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
@@ -337,7 +337,7 @@ event_ttl_duration: "1h0m0s"
 dns_etchosts: "{{ registry_ip }} {{ registry_domain }}"
 
 
-## Kubeadm config for compass OEM
+## Kubeadm config for containeros OEM
 ## This vars copy from roles/kubernetes/master/defaults/main/main.yml
 ### kubernetes adminssion plugins
 kube_apiserver_enable_admission_plugins:

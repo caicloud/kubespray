@@ -97,16 +97,16 @@ containerd_version: '1.4.1'
 # ContainerOS self config
 containeros_cluster: true
 ## Containerd repo
-# Use compass infra package repo
+# Use infra package repo
 # CentOS/RedHat docker-ce repo
 docker_rh_repo_base_url: "{{ download_url }}/runtime/containerd"
 docker_rh_repo_gpgkey: ""
 
 ## Cargo certs file path
-cargo_signed_certificate: "/kubespray/config/cargo_ca_cert/cargo-ca.crt"
+registry_signed_certificate: "/kubespray/config/registry_ca_cert/registry-ca.crt"
 
-# The var defines whether deploy a caicloud stack
-g_deploy_caicloud_stack: true
+# The var defines whether deploy a control stack
+deploy_control_cluster: true
 
 # The var defines cluster deploy config file
 config_dir: "/kubespray/config"
