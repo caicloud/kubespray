@@ -27,7 +27,7 @@
 - name: Hosts | populate inventory into hosts file
   blockinfile:
     path: /etc/hosts
-    block: "{{ cargo_ip }} {{ cargo_domain }}"
+    block: "{{ registry_ip }} {{ registry_domain }}"
     state: present
     create: yes
     backup: yes
