@@ -96,3 +96,32 @@ loadbalancer_apiserver_healthcheck_port: 8081
 containerd_version: '1.4.1'
 # ContainerOS self config
 containeros_cluster: true
+## Containerd repo
+# Use infra package repo
+# CentOS/RedHat docker-ce repo
+docker_rh_repo_base_url: "{{ download_url }}/runtime/containerd"
+docker_rh_repo_gpgkey: ""
+
+## Cargo certs file path
+registry_signed_certificate: "/kubespray/config/registry_ca_cert/registry-ca.crt"
+
+# The var defines whether deploy a control stack
+deploy_control_cluster: true
+
+# The var defines cluster deploy config file
+config_dir: "/kubespray/config"
+
+## Download config
+kube_version: v1.19.3
+image_arch: "{{host_architecture | default('amd64')}}"
+kubelet_download_url: "{{ download_url }}/files/kubelet-{{ kube_version }}-{{ image_arch }}"
+kubectl_download_url: "{{ download_url }}/files/kubectl-{{ kube_version }}-{{ image_arch }}"
+kubeadm_download_url: "{{ download_url }}/files/kubeadm-{{ kube_version }}-{{ image_arch }}"
+etcd_download_url: "{{ download_url }}/files/etcd-v3.4.13-linux-{{ image_arch }}.tar.gz"
+cni_download_url: "{{ download_url }}/files/cni-plugins-linux-{{ image_arch }}-v0.8.7.tgz"
+calicoctl_download_url: "{{ download_url }}/files/calicoctl"
+crictl_download_url: "{{ download_url }}/files/crictl-v1.19.0-linux-{{ image_arch }}.tar.gz"
+
+## Container runtime
+## docker for docker, crio for cri-o and containerd for containerd.
+container_manager: containerd
