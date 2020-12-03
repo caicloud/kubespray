@@ -29,4 +29,4 @@ cluster_vip: ""
 
 self_hosted_config_dir: "/etc/kubernetes/self_hosted"
 
-cluster_identity_name: "ContainerOS-stack"
+cluster_identity_name: "kubernetes-stack"
