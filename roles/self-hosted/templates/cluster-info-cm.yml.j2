@@ -1,0 +1,16 @@
+# 把控下参数内容，不能添加会随意更改的东西。
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: "{{ cluster_info_cm_name }}"
+  namespace: "{{ cos_running_namespaces }}"
+data:
+  kubeVersion: "{{ kube_version }}"
+{% if cluster_vip %}
+  clusterVIP: "{{ cluster_vip }}"
+{% endif %}
+  networking: "{{ kube_network_plugin }}"
+  cidr: "{{ kube_pods_subnet }}"
+  serviceIPRange: "{{ kube_service_addresses }}"
+  dnsIP: "{{ skydns_server }}"
+  dnsDomain: "{{ cluster_name }}"
