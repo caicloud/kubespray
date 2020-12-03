@@ -39,22 +39,22 @@
     kubectl apply -f {{ self_hosted_config_dir }}/ssh_secret.yml
   run_once: true
 
-- name: Copy cargo cert to master node
+- name: Copy registry cert to master node
   copy:
-    src: "{{ cargo_signed_certificate }}"
-    dest: "{{ kube_config_dir }}/cargo-ca.crt"
-  when: cargo_ca_self_sign
+    src: "{{ registry_signed_certificate }}"
+    dest: "{{ kube_config_dir }}/registry-ca.crt"
+  when: registry_ca_self_sign
 
-- name: Create secret for cargo ca cert
+- name: Create secret for registry ca cert
   shell: |
-    kubectl -n {{ cos_running_namespaces }} create secret generic cargo-ca-cert --from-file={{ kube_config_dir }}/cargo-ca.crt
-  when: cargo_ca_self_sign
+    kubectl -n {{ cos_running_namespaces }} create secret generic registry-ca-cert --from-file={{ kube_config_dir }}/registry-ca.crt
+  when: registry_ca_self_sign
   run_once: true
 
-- name: Create empty secret for cargo ca cert
+- name: Create empty secret for registry ca cert
   shell: |
-    kubectl -n {{ cos_running_namespaces }} create secret generic cargo-ca-cert
-  when: not cargo_ca_self_sign
+    kubectl -n {{ cos_running_namespaces }} create secret generic registry-ca-cert
+  when: not registry_ca_self_sign
   run_once: true
 
 # Fetch the kubeconfig file from cluster master node

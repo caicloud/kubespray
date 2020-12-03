@@ -8,7 +8,7 @@ cluster_info_cm_name: "cluster-info"
 
 # Config ntp server ipaddress
 ntp_server: ""
-ntp_server_address: "{% if ntp_server %}{{ ntp_server }}{% else %}{{ cargo_ip }}{% endif %}"
+ntp_server_address: "{% if ntp_server %}{{ ntp_server }}{% else %}{{ registry_ip }}{% endif %}"
 
 # The var defines cluster info configmap name
 is_control_cluster: true
