@@ -15,13 +15,6 @@
     group: root
     mode: 0o755
 
-# Add cargo dns resolve to coredns
-- name: Add cargo dns resolve
-  shell:
-    cmd:
-      "kubectl -n kube-system patch cm coredns --patch '{\"data\": {\"hosts\": \"192.168.21.97 devops.cargo.io\\n\"}}'"
-  run_once: true
-
 # Read ssh certs and create secret
 - name: Read ssh private key
   slurp:

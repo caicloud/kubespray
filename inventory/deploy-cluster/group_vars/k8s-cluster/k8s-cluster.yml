@@ -321,3 +321,7 @@ persistent_volumes_enabled: false
 
 ## Amount of time to retain events. (default 1h0m0s)
 event_ttl_duration: "1h0m0s"
+
+## Set dns record to resolve registry domain name
+dns_etchosts: "{{ cargo_ip }} {{ cargo_domain }}"
+
