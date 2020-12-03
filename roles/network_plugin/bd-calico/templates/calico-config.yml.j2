@@ -19,7 +19,7 @@ data:
   cluster_type: "kubespray"
   calico_backend: "{{ calico_network_backend }}"
 {% else %}
-  cluster_type: "kubespray,bgp"
+  cluster_type: "k8s,bgp"
   calico_backend: "bird"
 {% endif %}
 {% if inventory_hostname in groups['k8s-cluster'] and peer_with_router|default(false) %}

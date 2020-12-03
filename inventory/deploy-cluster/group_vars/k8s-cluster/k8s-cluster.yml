@@ -92,10 +92,13 @@ kube_users:
 
 # Choose network plugin (cilium, calico, contiv, weave or flannel. Use cni for generic cni plugin)
 # Can also be set to 'cloud', which lets the cloud provider setup appropriate routing
-kube_network_plugin: calico
+kube_network_plugin: bd-calico
 
 # Setting multi_networking to true will install Multus: https://github.com/intel/multus-cni
 kube_network_plugin_multus: false
+
+# used to bd-multus
+kube_network_plugin_bd_multus: true
 
 # Kubernetes internal network for services, unused block of space.
 kube_service_addresses: 10.233.0.0/18
@@ -351,3 +354,26 @@ kube_apiserver_enable_admission_plugins:
 kube_apiserver_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
 kube_controller_manager_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
 kube_scheduler_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
+
+# set calico mode: vxlan, bird, none, default is bird.
+calico_mode: "vxlan"
+
+# fixedip-ipam server config
+fixedip_ipam_enabled: false
+fixedip_ipam_server_service: ""
+fixedip_ipam_server_port: 6109
+
+fixedip_ipam_version: "v1.5.0-alpha.1"
+
+fixedip_ipam_client_image_repo: "{{ docker_image_repo }}/fixedip-ipam-client"
+fixedip_ipam_client_image_tag: "{{ fixedip_ipam_version }}"
+fixedip_ipam_server_image_repo: "{{ docker_image_repo }}/fixedip-ipam-server"
+fixedip_ipam_server_image_tag: "{{ fixedip_ipam_version }}"
+
+# bridge vlan info
+bridge_vlan_image_repo: "{{ docker_image_repo }}/bridge-vlan"
+bridge_vlan_image_tag: "v1.5.0-alpha.2"
+
+# network-agent
+network_agent_image_repo: "{{ docker_image_repo }}/network-agent"
+network_agent_image_tag: "v1.5.0-alpha.2"
