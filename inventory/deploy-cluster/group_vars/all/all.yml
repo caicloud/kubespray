@@ -94,3 +94,5 @@ loadbalancer_apiserver_healthcheck_port: 8081
 
 ## Set containerd version
 containerd_version: '1.4.1'
+# ContainerOS self config
+containeros_cluster: true

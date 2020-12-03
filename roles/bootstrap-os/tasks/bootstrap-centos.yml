@@ -50,6 +50,30 @@
     - '"Oracle" in os_release.stdout'
     - (ansible_distribution_version | float) >= 7.6
 
+## 1/3 Config infra mirrors
+- name: Backup system mifrrors config
+  shell: |
+    yum clean all | true && mv /etc/yum.repos.d /etc/yum.repos.d.`date +"%Y-%m-%d-%H-%M-%S"`.bak && mkdir -p /etc/yum.repos.d
+  when:
+    - containeros_cluster == true
+
+## 2/3 Config infra mirrors
+- name: Config infra mirrors
+  get_url:
+    url: "{{ download_url }}/sources/CentOS-8-All-In-One.repo"
+    dest: /etc/yum.repos.d/CentOS-8-All-In-One.repo
+  when:
+    - containeros_cluster == true
+    - (ansible_distribution_version | float) >= 8.0
+
+## 3/3 Config infra mirrors
+- name: Modify mirrors
+  shell: |
+    sed -i "s#__download_url__#{{ download_url }}#g" /etc/yum.repos.d/CentOS-8-All-In-One.repo && yum clean all && yum makecache
+  when:
+    - containeros_cluster == true
+    - (ansible_distribution_version | float) >= 8.0
+
 # CentOS ships with python installed
 
 - name: Check presence of fastestmirror.conf
@@ -86,3 +110,39 @@
     name: "{{ ( (ansible_distribution_major_version | int) < 8) | ternary('libselinux-python','python3-libselinux') }}"
     state: present
   become: true
+
+# stop and disable firewalld
+- name: Stop and disable firewalld
+  systemd:
+    name: firewalld
+    state: stopped
+    enabled: false
+    masked: true
+
+# 1/4 Trust registry self-signed certificate
+- name: Check that the registry self-signed cerfiicate exists
+  stat:
+    path: "{{ registry_signed_certificate }}"
+  register: stat_result
+
+- name: Set fact false, if it doesnt exist already
+  set_fact:
+    registry_ca_self_sign: false
+  when: stat_result.stat.exists == False 
+
+# 2/4 Trust registry self-signed certificate
+- name: Enable ca configuration
+  shell: update-ca-trust force-enable
+  when: registry_ca_self_sign
+
+# 3/4 Trust registry self-signed certificate
+- name: Copy crt to certificate file
+  copy:
+    src: "{{ registry_signed_certificate }}"
+    dest: "/etc/pki/ca-trust/source/anchors/registry-ca.crt"
+  when: registry_ca_self_sign
+
+# 4/4 Trust registry self-signed certificate
+- name: Update certificate
+  shell: update-ca-trust
+  when: registry_ca_self_sign

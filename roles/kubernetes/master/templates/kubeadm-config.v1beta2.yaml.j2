@@ -259,6 +259,9 @@ apiServer:
 {% for san in apiserver_sans %}
   - {{ san }}
 {% endfor %}
+{% if cluster_vip %}
+  - {{ cluster_vip }}
+{% endif %}
   timeoutForControlPlane: 5m0s
 controllerManager:
   extraArgs:
