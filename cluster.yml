@@ -140,5 +140,5 @@
   gather_facts: False
   any_errors_fatal: "{{ any_errors_fatal | default(true) }}"
   roles:
-    - { role: self-hosted, when: "inventory_hostname in groups['kube-master']", tags: self-hosted }
-  when: containeros_cluster
+    - { role: self-hosted, when: "inventory_hostname in groups['kube-master'] and containeros_cluster", tags: self-hosted }
+
