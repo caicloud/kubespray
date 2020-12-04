@@ -91,3 +91,11 @@ typha_max_connections_lower_limit: 300
 typha_secure: false
 
 calico_feature_control: {}
+
+# set calico mode: vxlan, bird, none, default is bird.
+calico_mode: "vxlan"
+
+# fixedip-ipam server config
+fixedip_ipam_enabled: false
+fixedip_ipam_server_service: ""
+fixedip_ipam_server_port: 6109

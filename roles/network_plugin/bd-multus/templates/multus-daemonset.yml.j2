@@ -25,6 +25,41 @@ spec:
       tolerations:
       - operator: Exists
       serviceAccountName: multus
+      initContainers:
+      - command:
+        - /bin/bash
+        - -c
+        - install -m 744 /root/bridge-vlan /host/opt/cni/bin/
+        image: {{ bridge_vlan_image_repo }}:{{ bridge_vlan_image_tag }}
+        name: init-kube-bridge-vlan
+        resources:
+          limits:
+            cpu: 20m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        volumeMounts:
+        - mountPath: /host/opt/cni/bin
+          mountPropagation: HostToContainer
+          name: cnibin
+      - command:
+        - /bin/bash
+        - -c
+        - install -m 744 /root/fixedip-ipam /host/opt/cni/bin/
+        image: {{ fixedip_ipam_client_image_repo }}:{{ fixedip_ipam_client_image_tag }}
+        name: init-kube-fixedip-ipam
+        resources:
+          limits:
+            cpu: 20m
+            memory: 50Mi
+          requests:
+            cpu: 10m
+            memory: 20Mi
+        volumeMounts:
+        - mountPath: /host/opt/cni/bin
+          mountPropagation: HostToContainer
+          name: cnibin
       containers:
       - name: kube-multus
         image: {{ multus_image_repo }}:{{ multus_image_tag }}
@@ -32,7 +67,7 @@ spec:
         args:
         - "--cni-conf-dir={{ multus_cni_conf_dir }}"
         - "--cni-bin-dir={{ multus_cni_bin_dir }}"
-        - "--multus-conf-file={{ multus_conf_file }}"
+        - "--multus-conf-file=/tmp/multus-conf/02-multus.conf"
         - "--multus-kubeconfig-file-host={{ multus_kubeconfig_file_host }}"
         - "--cni-version={{ multus_cni_version }}"
 {% if container_manager == 'crio' %}
@@ -60,6 +95,9 @@ spec:
           mountPath: {{  multus_cni_conf_dir }}
         - name: cnibin
           mountPath: {{ multus_cni_bin_dir }}
+        - mountPath: /tmp/multus-conf
+          mountPropagation: HostToContainer
+          name: multus-cfg
       volumes:
 {% if container_manager == 'crio' %}
       - name: run
@@ -72,3 +110,11 @@ spec:
       - name: cnibin
         hostPath:
           path: {{ multus_cni_bin_dir_host }}
+      - name: multus-cfg
+        configMap:
+          defaultMode: 420
+          items:
+          - key: cni-conf.json
+            path: 02-multus.conf
+          name: multus-cni-config
+

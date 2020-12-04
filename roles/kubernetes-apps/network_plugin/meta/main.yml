@@ -49,3 +49,13 @@ dependencies:
     when: kube_network_plugin_multus
     tags:
       - multus
+
+  - role: kubernetes-apps/network_plugin/bd-calico
+    when: kube_network_plugin == 'bd-calico'
+    tags:
+      - bd-calico
+
+  - role: kubernetes-apps/network_plugin/bd-multus
+    when: kube_network_plugin_bd_multus
+    tags:
+      - bd-multus

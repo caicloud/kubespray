@@ -8,3 +8,21 @@ multus_cni_bin_dir: "{{ ('/host', multus_cni_bin_dir_host) | join }}"
 multus_cni_run_dir: "{{ ('/host', multus_cni_run_dir_host) | join }}"
 multus_cni_version: "0.4.0"
 multus_kubeconfig_file_host: "{{ (multus_cni_conf_dir_host, '/multus.d/multus.kubeconfig') | join }}"
+
+default_network_is_fixedip: false
+
+fixedip_ipam_server_port: 9109
+
+default_network_name: k8s-pod-network
+default_network_display_name: "默认网络"
+default_network_ip_recycle_timeout: -1
+
+# inClusterRR or torRR
+calico_bgp_mode: ""
+calico_bgp_internal_rrs: ""
+calico_bgp_tor_rr_ips: ""
+
+global_as_num: 64512
+
+default_network_subnet_random_id: "{{ 10000 | random }}"
+default_network_subnet_id: "{{ default_network_subnet_random_id | to_uuid }}"

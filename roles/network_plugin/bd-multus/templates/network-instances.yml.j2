@@ -1,0 +1,31 @@
+---
+apiVersion: networking.containeros.dev/v1beta1
+kind: Network
+metadata:
+  name: {{ default_network_name }}
+  annotations:
+    displayName: "{{ default_network_display_name }}"
+spec:
+  type: "calico"
+  isDefaultNetwork: true
+  isFixedIP: {{ default_network_is_fixedip }}
+  ipRecycleTimeout: {{ default_network_ip_recycle_timeout }}
+  cni:
+{% if kube_network_plugin == "bd-calico" %}
+    calico:
+      mode: "{{ calico_ipv4pool_ipip }}"
+      bgpMode: "{{ calico_bgp_mode }}"
+      asNumber: {{ global_as_num }}
+{% endif %}
+  subnets:
+  - id: "{{ default_network_subnet_id }}"
+    cidr: "{{ kube_pods_subnet }}"
+    nodeCidrMaskSize: {{ kube_network_node_prefix }}
+
+---
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  namespace: kube-system
+  name: {{ default_network_name }}
+spec: {}
