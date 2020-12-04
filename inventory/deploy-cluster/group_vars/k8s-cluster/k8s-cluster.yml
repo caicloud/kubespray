@@ -377,3 +377,7 @@ bridge_vlan_image_tag: "v1.5.0-alpha.2"
 # network-agent
 network_agent_image_repo: "{{ docker_image_repo }}/network-agent"
 network_agent_image_tag: "v1.5.0-alpha.2"
+
+# multus
+multus_image_repo: "{{ registry_domain }}/library/multus"
+multus_image_tag: "3.6"

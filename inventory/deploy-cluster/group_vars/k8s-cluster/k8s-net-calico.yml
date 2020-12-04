@@ -77,3 +77,9 @@ calico_iptables_backend: "NFT"
 # If you want use the default route interface when you use multiple interface with dynamique route (iproute2)
 # see https://docs.projectcalico.org/reference/node/configuration : FELIX_DEVICEROUTESOURCEADDRESS
 # calico_use_default_route_src_ipaddr: false
+
+calico_cni_image_repo: "{{ registry_domain }}/library/calico-cni"
+calico_cni_image_tag: "3.15.2"
+
+calico_node_image_repo: "{{ registry_domain }}/library/calico-node"
+calico_node_image_tag: "3.15.2"
