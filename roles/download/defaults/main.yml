@@ -728,7 +728,7 @@ downloads:
     - k8s-cluster
 
   calicoctl:
-    enabled: "{{ kube_network_plugin == 'calico' or kube_network_plugin == 'canal' }}"
+    enabled: "{{ kube_network_plugin == 'calico' or kube_network_plugin == 'canal' or kube_network_plugin == 'bd-calico' }}"
     file: true
     version: "{{ calico_ctl_version }}"
     dest: "{{ local_release_dir }}/calicoctl"
@@ -741,7 +741,7 @@ downloads:
     - k8s-cluster
 
   calico_node:
-    enabled: "{{ kube_network_plugin == 'calico' or kube_network_plugin == 'canal' }}"
+    enabled: "{{ kube_network_plugin == 'calico' or kube_network_plugin == 'canal' or kube_network_plugin == 'bd-calico' }}"
     container: true
     repo: "{{ calico_node_image_repo }}"
     tag: "{{ calico_node_image_tag }}"
@@ -750,7 +750,7 @@ downloads:
     - k8s-cluster
 
   calico_cni:
-    enabled: "{{ kube_network_plugin == 'calico' or kube_network_plugin == 'canal' }}"
+    enabled: "{{ kube_network_plugin == 'calico' or kube_network_plugin == 'canal' or kube_network_plugin == 'bd-calico' }}"
     container: true
     repo: "{{ calico_cni_image_repo }}"
     tag: "{{ calico_cni_image_tag }}"
@@ -759,7 +759,7 @@ downloads:
     - k8s-cluster
 
   calico_policy:
-    enabled: "{{ enable_network_policy and kube_network_plugin in ['calico', 'canal'] }}"
+    enabled: "{{ enable_network_policy and kube_network_plugin in ['calico', 'canal', 'bd-calico'] }}"
     container: true
     repo: "{{ calico_policy_image_repo }}"
     tag: "{{ calico_policy_image_tag }}"
