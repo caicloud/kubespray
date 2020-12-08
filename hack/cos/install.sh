@@ -17,6 +17,7 @@ DEPLOY_ROOT=$(cd $(dirname "${BASH_SOURCE}")/ && pwd -P)
 CONFIG_DIR=${DEPLOY_ROOT}/.config
 SSH_CERT_DIR=${DEPLOY_ROOT}/ssh_cert
 DEPLOY_CONTAINER_NAME="cluster-deploy-job"
+REGISTRY_AUTH=`cat env.yml | grep registry_auth | awk '{print $2}' | sed 's#"##g'`
 
 mkdir -p ${CONFIG_DIR}/registry_ca_cert
 
@@ -55,14 +56,21 @@ cp env.yml ${CONFIG_DIR}
 cp -r ${SSH_CERT_DIR} ${CONFIG_DIR}
 cp -r ${CARGO_CFG_CA_PATH} ${CONFIG_DIR}/registry_ca_cert
 
+function push_image() {
+  ctr i tag ${IMAGE_FALL_NAME} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME} || true
+  if [[ ${REGISTRY_AUTH} == "" ]]; then
+    ctr i push ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME}
+  else
+    ctr i push -u ${REGISTRY_AUTH} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME}
+  fi
+}
+
 function initializ() {
   ALL_IMAGE_FILE_LIST=`find ./resources/images/data -type f -name "*.tar.gz"`
   for IMAGE_FILE_PATH in ${ALL_IMAGE_FILE_LIST}; do
     IMAGE_FALL_NAME=`ctr i import ${IMAGE_FILE_PATH} | awk '{print $2}'`
     IMAGE_NAME=`echo ${IMAGE_FALL_NAME} | awk -F '/cluster-deploy/' '{print $NF}'`
-    REGISTRY_AUTH=`cat env.yml | grep registry_auth | awk '{print $2}' | sed 's#"##g'`
-    ctr i tag ${IMAGE_FALL_NAME} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME} || true
-    ctr i push -u ${REGISTRY_AUTH} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME}
+    push_image
   done
 }
 
@@ -74,8 +82,7 @@ function load_deploy_image() {
 
 function push_deploy_image() {
   IMAGE_NAME=`echo ${IMAGE_FALL_NAME} | awk -F '/cluster-deploy/' '{print $NF}'`
-  ctr i tag ${IMAGE_FALL_NAME} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME} || true
-  ctr i push -u admin:Pwd123456 ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME}
+  push_image
 }
 
 function cluster_deploy() {
