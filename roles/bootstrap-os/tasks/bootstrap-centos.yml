@@ -124,11 +124,11 @@
   stat:
     path: "{{ registry_signed_certificate }}"
   register: stat_result
+  delegate_to: localhost
 
 - name: Set fact false, if it doesnt exist already
   set_fact:
-    registry_ca_self_sign: false
-  when: stat_result.stat.exists == False 
+    cargo_ca_self_sign: "{{ stat_result.stat.exists }}"
 
 # 2/4 Trust registry self-signed certificate
 - name: Enable ca configuration
