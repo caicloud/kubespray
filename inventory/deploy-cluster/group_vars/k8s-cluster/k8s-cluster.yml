@@ -17,7 +17,7 @@ kube_token_dir: "{{ kube_config_dir }}/tokens"
 # This is where to save basic auth file
 kube_users_dir: "{{ kube_config_dir }}/users"
 
-kube_api_anonymous_auth: true
+kube_api_anonymous_auth: false
 
 ## Change this to use another Kubernetes version, e.g. a current beta release
 kube_version: v1.19.3
@@ -232,7 +232,7 @@ default_kubelet_config_dir: "{{ kube_config_dir }}/dynamic_kubelet_dir"
 dynamic_kubelet_configuration_dir: "{{ kubelet_config_dir | default(default_kubelet_config_dir) }}"
 
 # pod security policy (RBAC must be enabled either by having 'RBAC' in authorization_modes or kubeadm enabled)
-podsecuritypolicy_enabled: false
+podsecuritypolicy_enabled: true
 
 # Custom PodSecurityPolicySpec for restricted policy
 # podsecuritypolicy_restricted_spec: {}
@@ -295,6 +295,13 @@ persistent_volumes_enabled: false
 # tls_min_version: ""
 
 ## Support tls cipher suites.
+tls_cipher_suites:
+  - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+  - TLS_ECDHE_ECDSA_WITH_CHACHA20_POLY1305
+  - TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+  - TLS_ECDHE_RSA_WITH_CHACHA20_POLY1305
+  - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
 # tls_cipher_suites: {}
 #   - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA
 #   - TLS_ECDHE_ECDSA_WITH_AES_128_CBC_SHA256
@@ -333,8 +340,7 @@ kube_apiserver_enable_admission_plugins:
   - NodeRestriction
   - DenyEscalatingExec
   - AlwaysPullImages
-#  - PodSecurityPolicy
-#  - EventRateLimit
+  - EventRateLimit
 
 ### Set k8s component bind host address
 kube_apiserver_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
@@ -348,3 +354,22 @@ fixedip_ipam_server_service: ""
 # fixedip-ipam service port
 fixedip_ipam_server_port: 9109
 fixedip_ipam_webhook_port: 9110
+
+### CIS modify
+kube_controller_terminated_pod_gc_threshold: 1000
+kube_api_runtime_config: ["extensions/v1beta1/networkpolicies","batch/v2alpha1"]
+audit_log_maxbackups: 10
+kubelet_rotate_server_certificates: true
+kube_feature_gates: ["RotateKubeletServerCertificate=true"]
+## Support parameters to be passed to kubelet via kubelet-config.yaml
+kubelet_config_extra_args: {
+  eventRecordQPS: 0,
+  podPidsLimit: 10240,
+  streamingConnectionIdleTimeout: 30m,
+  evictionHard: {"memory.available": "100Mi", "nodefs.available": "1%", "nodefs.inodesFree": "1", "imagefs.available": "3%", "imagefs.inodesFree": "10"},
+  evictionSoft: {"memory.available": "300Mi", "nodefs.available": "5%", "nodefs.inodesFree": "10", "imagefs.available": "8%", "imagefs.inodesFree": "100"},
+  evictionSoftGracePeriod: {"memory.available": "30s", "nodefs.available": "1m", "nodefs.inodesFree": "1m", "imagefs.available": "2m", "imagefs.inodesFree": "2m"},
+  evictionPressureTransitionPeriod: 3s,
+  tlsCertFile: "{{ kube_cert_dir }}/apiserver-kubelet-client.crt",
+  tlsPrivateKeyFile: "{{ kube_cert_dir }}/apiserver-kubelet-client.key"
+}
