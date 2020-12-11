@@ -14,7 +14,6 @@
     {% endif %}
 {% endif %}
       "type": "calico",
-      "mode": "{{ calico_mode }}",
       "log_level": "info",
 {% if calico_datastore == "etcd" %}
       "etcd_endpoints": "{{ etcd_access_addresses }}",
