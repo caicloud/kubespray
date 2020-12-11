@@ -17,12 +17,5 @@ default_network_name: k8s-pod-network
 default_network_display_name: "默认网络"
 default_network_ip_recycle_timeout: -1
 
-# inClusterRR or torRR
-calico_bgp_mode: ""
-calico_bgp_internal_rrs: ""
-calico_bgp_tor_rr_ips: ""
-
-global_as_num: 64512
-
 default_network_subnet_random_id: "{{ 10000 | random }}"
 default_network_subnet_id: "{{ default_network_subnet_random_id | to_uuid }}"

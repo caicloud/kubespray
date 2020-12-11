@@ -13,9 +13,12 @@ spec:
   cni:
 {% if kube_network_plugin == "bd-calico" %}
     calico:
-      mode: "{{ calico_ipv4pool_ipip }}"
-      bgpMode: "{{ calico_bgp_mode }}"
-      asNumber: {{ global_as_num }}
+      networkBackend: "{{ calico_network_backend }}"
+{% if calico_network_backend == "bird" %}
+      rrPeerType: "{{ peer_with_router | ternary('router', 'inCluster') }}"
+      rrPeers: ""
+      asNumber: "{{ global_as_num }}"
+{% endif %}
 {% endif %}
   subnets:
   - id: "{{ default_network_subnet_id }}"

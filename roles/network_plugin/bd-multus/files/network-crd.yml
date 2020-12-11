@@ -56,6 +56,8 @@ spec:
                         phyDev:
                           type: string
                         vlan:
+                          maximum: 4094
+                          minimum: 2
                           type: integer
                       required:
                         - phyDev
@@ -65,25 +67,43 @@ spec:
                       description: Calico describes the calico info.
                       properties:
                         asNumber:
+                          description: ASNumber represent the autonomous system of bgp
+                          maximum: 65534
+                          minimum: 64512
                           type: integer
-                        bgpMode:
+                        networkBackend:
+                          enum:
+                            - bird
+                            - vxlan
+                            - none
                           type: string
-                        mode:
+                        rrPeerType:
+                          description: RRPeerType represent where the bgp router reflector locates
+                          enum:
+                            - inCluster
+                            - router
                           type: string
-                        rrIPs:
-                          items:
-                            type: string
-                          type: array
-                        rrNodes:
+                        rrPeers:
                           items:
                             type: string
                           type: array
                       required:
-                        - bgpMode
-                        - mode
+                        - networkBackend
                       type: object
                     canal:
-                      description: Canal describes canal info.
+                      description: Canal describes canal info. Deprecated
+                      type: object
+                    other:
+                      description: OtherCNI describes cni we do not support yet.
+                      properties:
+                        Paremeters:
+                          additionalProperties:
+                            type: string
+                          type: object
+                        type:
+                          type: string
+                      required:
+                        - type
                       type: object
                   type: object
                 ipRecycleTimeout:
@@ -98,6 +118,7 @@ spec:
                     description: Subnet describe subnet info.
                     properties:
                       cidr:
+                        description: CIDR represent the cidr of this subnet
                         type: string
                       gateway:
                         anyOf:
