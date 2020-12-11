@@ -22,6 +22,9 @@ kube_api_anonymous_auth: true
 ## Change this to use another Kubernetes version, e.g. a current beta release
 kube_version: v1.19.3
 
+# set calico version to v3.17.0
+calico_version: "v3.17.0"
+
 # registry domain config
 registry_domain: ""
 registry_project: "cluster-deploy"
