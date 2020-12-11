@@ -18,14 +18,32 @@ INVENTORY_PATH=${DEPLOY_HOME}/inventory/deploy-cluster
 CONFIG_PATH=${DEPLOY_HOME}/config
 
 if ! [[ -d ${CONFIG_PATH} ]]; then
-  echo -e "\033[1;31m Config path not exist, Please check \033[0m"
+  echo -e "${RED_COL} Config path not exist, Please check ${NORMAL_COL}"
   exit 1
 fi
+
+# Gen ssh certs and copy to every host
+function ssh_certs() {
+  # Ensure certs not exist
+  if ! [[ -f ${CONFIG_PATH}/ssh_cert/id_rsa ]]; then
+    ansible-playbook -i ${CONFIG_PATH}/inventory host-key.yml
+  fi
+  cp -f ${CONFIG_PATH}/inventory ${INVENTORY_PATH}/inventory
+  sed -i "s#ansible_ssh_pass=[^\s]*#ansible_ssh_private_key_file=${CONFIG_PATH}/ssh_cert/id_rsa#g" ${INVENTORY_PATH}/inventory
+}
 
 # Copy from config path
 rm -f ${INVENTORY_PATH}/env.yml ${INVENTORY_PATH}/inventory
 cp -f ${CONFIG_PATH}/env.yml ${INVENTORY_PATH}/env.yml
-cp -f ${CONFIG_PATH}/inventory ${INVENTORY_PATH}/inventory
+
+if cat ${CONFIG_PATH}/inventory | grep -v "^#" | grep -Eqi "ansible_ssh_pass=" ; then
+  ssh_certs
+elif cat ${CONFIG_PATH}/inventory | grep -v "^#" | grep -Eqi "ansible_ssh_private_key_file=" ; then
+  cp -f ${CONFIG_PATH}/inventory ${INVENTORY_PATH}/inventory
+else
+  echo -e "${RED_COL} Can't find the host auth config, Please check inventory file. ${NORMAL_COL}"
+  exit 1
+fi
 
 case $input in
   init-machine )
@@ -34,19 +52,19 @@ case $input in
     ;;
   install )
 # TODO: add install layer
-    echo -e "\033[32m       ############ Start install cluster ################       \033[0m"
+    echo -e "${GREEN_COL}       ############ Start install cluster ################       ${NORMAL_COL}"
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       cluster.yml
     ;;
   remove )
-    echo -e "\033[32m       ############ Start remove cluster #################       \033[0m"
+    echo -e "${GREEN_COL}       ############ Start remove cluster #################       ${NORMAL_COL}"
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       -e reset_confirmation=yes --skip-tags='mounts' \
       reset.yml
     ;;
   add-node )
     NODE_NAME=$2
-    echo -e "\033[32m       ############ Start add work node ##################       \033[0m"
+    echo -e "${GREEN_COL}       ############ Start add work node ##################       ${NORMAL_COL}"
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       --limit=${NODE_NAME} \
       scale.yml
@@ -54,7 +72,7 @@ case $input in
   remove-node )
     NODE_NAME=$2
     reset_nodes=false
-    echo -e "\033[32m       ############ Start remove work node ###############       \033[0m"
+    echo -e "${GREEN_COL}       ############ Start remove work node ###############       ${NORMAL_COL}"
     # about 3mins
     if [[ -n $3 ]] && [[ x$3 = "xnot-reset" ]]; then
       ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
@@ -67,7 +85,7 @@ case $input in
     fi
     ;;
   add-master )
-    echo -e "\033[32m       ############ Start add master node ################       \033[0m"
+    echo -e "${GREEN_COL}       ############ Start add master node ################       ${NORMAL_COL}"
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       cluster.yml
     # restart every node nginx service
@@ -75,7 +93,7 @@ case $input in
     ;;
   remove-master )
     NODE_NAME=$2
-    echo -e "\033[32m       ############ Start remove master node #############       \033[0m"
+    echo -e "${GREEN_COL}       ############ Start remove master node #############       ${NORMAL_COL}"
     if [[ -n $3 ]] && [[ x$3 = "xnot-reset" ]]; then
       ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
         -e node=${NODE_NAME} -e delete_nodes_confirmation=yes -e reset_nodes=false \
@@ -87,7 +105,7 @@ case $input in
     fi
     ;;
   add-etcd )
-    echo -e "\033[32m       ############ Start add etcd node ##################       \033[0m"
+    echo -e "${GREEN_COL}       ############ Start add etcd node ##################       ${NORMAL_COL}"
     # add etcd node
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       --limit=etcd,kube-master -e ignore_assert_errors=yes -e etcd_retries=20 \
@@ -100,7 +118,7 @@ case $input in
     ;;
   remove-etcd )
     NODE_NAME=$2
-    echo -e "\033[32m       ############ Start remove etcd node ###############       \033[0m"
+    echo -e "${GREEN_COL}       ############ Start remove etcd node ###############       ${NORMAL_COL}"
     # remove etcd node
     if [[ -n $3 ]] && [[ x$3 = "xnot-reset" ]]; then
       ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
