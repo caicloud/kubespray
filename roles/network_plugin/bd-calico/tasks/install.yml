@@ -32,7 +32,7 @@
 - name: Calico | Write Calico cni config
   template:
     src: "cni-calico.conflist.j2"
-    dest: "/etc/cni/net.d/{% if calico_version is version('v3.3.0', '>=') %}calico.conflist.template{% else %}10-calico.conflist{% endif %}"
+    dest: "/etc/cni/multus/net.d/{% if calico_version is version('v3.3.0', '>=') %}calico.conflist.template{% else %}10-calico.conflist{% endif %}"
     owner: kube
   register: calico_conflist
   notify: reset_calico_cni
@@ -314,7 +314,7 @@
 
 - name: Wait for calico kubeconfig to be created
   wait_for:
-    path: /etc/cni/net.d/calico-kubeconfig
+    path: /etc/cni/multus/net.d/calico-kubeconfig
   when:
     - inventory_hostname not in groups['kube-master']
     - calico_datastore == "kdd"
