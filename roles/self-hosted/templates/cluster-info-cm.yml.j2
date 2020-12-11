@@ -9,7 +9,7 @@ data:
 {% if cluster_vip %}
   clusterVIP: "{{ cluster_vip }}"
 {% endif %}
-  networking: "{{ kube_network_plugin }}"
+  networking: "{{ (kube_network_plugin == 'bd-calico') | ternary('calico', kube_network_plugin) }}"
   cidr: "{{ kube_pods_subnet }}"
   serviceIPRange: "{{ kube_service_addresses }}"
   dnsIP: "{{ skydns_server }}"
