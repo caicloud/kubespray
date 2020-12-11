@@ -1,0 +1,35 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: network-agent
+rules:
+  - apiGroups:
+      - networking.containeros.dev
+    resources:
+      - networks
+    verbs:
+      - list
+      - get
+      - watch
+      - update
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: network-agent
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: network-agent
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: network-agent
+subjects:
+  - kind: ServiceAccount
+    name: network-agent
+    namespace: kube-system
