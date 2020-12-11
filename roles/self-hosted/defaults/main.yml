@@ -23,7 +23,7 @@ local_config_path: "/kubespray/config"
 local_kubeconfig_file: "{{ local_config_path }}/kubectl.kubeconfig"
 
 # The var defines the ssh certs directory path. The ssh certs file name must is "id_rsa.pub" and "id_rsa"
-ssh_certs_path: "{{ local_config_path }}/ssh_cert"
+# ssh_certs_path: "{{ local_config_path }}/ssh_cert"
 
 cluster_vip: ""
 

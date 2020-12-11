@@ -16,6 +16,7 @@ NORMAL_COL="\\033[0;39m"
 DEPLOY_HOME=/kubespray
 INVENTORY_PATH=${DEPLOY_HOME}/inventory/deploy-cluster
 CONFIG_PATH=${DEPLOY_HOME}/config
+SSH_CERT_PATH=${CONFIG_PATH}/ssh_cert
 
 if ! [[ -d ${CONFIG_PATH} ]]; then
   echo -e "${RED_COL} Config path not exist, Please check ${NORMAL_COL}"
@@ -25,11 +26,15 @@ fi
 # Gen ssh certs and copy to every host
 function ssh_certs() {
   # Ensure certs not exist
-  if ! [[ -f ${CONFIG_PATH}/ssh_cert/id_rsa ]]; then
-    ansible-playbook -i ${CONFIG_PATH}/inventory host-key.yml
+  if [[ -f ${SSH_CERT_PATH}/id_rsa ]]; then
+    ansible-playbook -i ${CONFIG_PATH}/inventory --skip-tags='gen-cert' -e "rsa_cert_path=${SSH_CERT_PATH}" host-key.yml
+  else
+    SSH_CERT_PATH="/kubespray/config/ssh_certs"
+    mkdir -p ${SSH_CERT_PATH}
+    ansible-playbook -i ${CONFIG_PATH}/inventory -e "rsa_cert_path=${SSH_CERT_PATH}" host-key.yml
   fi
   cp -f ${CONFIG_PATH}/inventory ${INVENTORY_PATH}/inventory
-  sed -i "s#ansible_ssh_pass=[^\s]*#ansible_ssh_private_key_file=${CONFIG_PATH}/ssh_cert/id_rsa#g" ${INVENTORY_PATH}/inventory
+  sed -i "s#ansible_ssh_pass=[^\s]*#ansible_ssh_private_key_file=${SSH_CERT_PATH}/id_rsa#g" ${INVENTORY_PATH}/inventory
 }
 
 # Copy from config path

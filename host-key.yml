@@ -28,13 +28,15 @@
   tasks:
     - name: Set fact
       set_fact:
-        rsa_cert_path: "/kubespray/config/ssh_cert"
+        rsa_cert_path: "/kubespray/config/ssh_certs"
 
     - name: Gen ssh certs
       shell: |
-        rm -rf {{ rsa_cert_path }}/id_rsa* && ssh-keygen -t rsa -f {{ rsa_cert_path }}/id_rsa  -P ""
+        ssh-keygen -t rsa -f {{ rsa_cert_path }}/id_rsa  -P ""
       delegate_to: localhost
       run_once: true
+      tags:
+      - gen-cert
 
     - name: ssh-copy
       authorized_key: user={{ ansible_user }} key="{{ lookup('file', '{{ rsa_cert_path }}/id_rsa.pub') }}"
