@@ -1,0 +1,79 @@
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: fixedip-ipam-server
+rules:
+  - apiGroups:
+      - networking.containeros.dev
+    resources:
+      - networks
+    verbs:
+      - watch
+      - get
+      - list
+  - apiGroups:
+      - networking.containeros.dev
+    resources:
+      - ipresources
+    verbs:
+      - create
+      - update
+      - delete
+      - get
+      - list
+      - watch
+  - apiGroups:
+      - ""
+    resources:
+      - pods
+    verbs:
+      - watch
+      - update
+      - list
+      - get
+  - apiGroups:
+      - batch
+    resources:
+      - cronjobs
+      - jobs
+    verbs:
+      - watch
+      - list
+      - get
+  - apiGroups:
+      - apps
+    resources:
+      - replicasets
+      - statefulsets
+      - deployments
+    verbs:
+      - watch
+      - list
+      - get
+  - apiGroups:
+      - policy
+    resources:
+      - podsecuritypolicies
+    verbs:
+      - use
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: fixedip-ipam-server
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: fixedip-ipam-server
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: fixedip-ipam-server
+subjects:
+  - kind: ServiceAccount
+    name: fixedip-ipam-server
+    namespace: kube-system

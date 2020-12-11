@@ -34,7 +34,7 @@ spec:
             periodSeconds: 10
             successThreshold: 1
             timeoutSeconds: 1
-          name: fixedip-ipam-server
+          name: server
           ports:
             - containerPort: {{ fixedip_ipam_server_port }}
           readinessProbe:
@@ -56,10 +56,9 @@ spec:
               memory: 200Mi
       hostNetwork: true
       nodeSelector:
-        caicloud.io/role: master
+        node-role.kubernetes.io/master: ""
       priorityClassName: system-cluster-critical
-      serviceAccount: fixedip-ipam
-      serviceAccountName: fixedip-ipam
+      serviceAccountName: fixedip-ipam-server
       terminationGracePeriodSeconds: 5
       tolerations:
         - effect: NoSchedule
