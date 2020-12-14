@@ -47,12 +47,14 @@
 
 - name: Create secret for registry ca cert
   shell: |
+    kubectl -n {{ cos_running_namespaces }} delete secret registry-ca-cert || true && \
     kubectl -n {{ cos_running_namespaces }} create secret generic registry-ca-cert --from-file={{ kube_config_dir }}/registry-ca.crt
   when: registry_ca_self_sign
   run_once: true
 
 - name: Create empty secret for registry ca cert
   shell: |
+    kubectl -n {{ cos_running_namespaces }} delete secret registry-ca-cert || true && \
     kubectl -n {{ cos_running_namespaces }} create secret generic registry-ca-cert
   when: not registry_ca_self_sign
   run_once: true
