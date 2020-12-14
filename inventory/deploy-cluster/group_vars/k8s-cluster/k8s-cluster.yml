@@ -24,17 +24,21 @@ kube_version: v1.19.3
 
 # registry domain config
 registry_domain: ""
-registry_project: "cluster-deploy"
+registry_project_release: "release"
+registry_project_library: "library"
 
 # gcr and kubernetes image repo define
-gcr_image_repo: "{{ registry_domain }}/{{ registry_project }}"
-kube_image_repo: "{{ registry_domain }}/{{ registry_project }}"
+gcr_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
+kube_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
 
 # docker image repo define
-docker_image_repo: "{{ registry_domain }}/{{ registry_project }}"
+docker_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
 
 # quay image repo define
-quay_image_repo: "{{ registry_domain }}/{{ registry_project }}"
+quay_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
+
+# self release repo define
+release_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
 
 # Where the binaries will be downloaded.
 # Note: ensure that you've enough disk space (about 1G)
