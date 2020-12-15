@@ -1,0 +1,10 @@
+# CentOS-All-In-One.repo
+#
+# The mirror contains all files needed to deploy caicloud stack.
+
+[BaseOS]
+name=CentOS-$releasever - Base
+baseurl=file://__BASE__/centos/$releasever
+gpgcheck=1
+enabled=1
+gpgkey=file://__BASE__/centos/$releasever/RPM-GPG-KEY-CentOS-7
