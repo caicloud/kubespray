@@ -10,6 +10,7 @@
     - {name: multus-serviceaccount, file: multus-serviceaccount.yml, type: serviceaccount}
     - {name: multus-clusterrole, file: multus-clusterrole.yml, type: clusterrole}
     - {name: multus-clusterrolebinding, file: multus-clusterrolebinding.yml, type: clusterrolebinding}
+    - {name: network-agent-rbac, file: network-agent-rbac.yml, type: rbac}
   register: multus_manifest_1
 
 - name: Multus | Copy manifest templates
