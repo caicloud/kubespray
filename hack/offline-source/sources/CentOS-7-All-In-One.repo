@@ -3,8 +3,8 @@
 # The mirror contains all files needed to deploy caicloud stack.
 
 [BaseOS]
-name=CentOS-$releasever - Base
-baseurl=file://__BASE__/centos/$releasever
+name=CentOS-7 - Base
+baseurl=__download_url__/centos/7
 gpgcheck=1
 enabled=1
-gpgkey=file://__BASE__/centos/$releasever/RPM-GPG-KEY-CentOS-7
+gpgkey=__download_url__/centos/7/RPM-GPG-KEY-CentOS-7

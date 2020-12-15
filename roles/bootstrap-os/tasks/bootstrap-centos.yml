@@ -60,19 +60,17 @@
 ## 2/3 Config infra mirrors
 - name: Config infra mirrors
   get_url:
-    url: "{{ download_url }}/sources/CentOS-8-All-In-One.repo"
-    dest: /etc/yum.repos.d/CentOS-8-All-In-One.repo
+    url: "{{ download_url }}/sources/CentOS-{{ ansible_distribution_major_version }}-All-In-One.repo"
+    dest: /etc/yum.repos.d/CentOS-{{ ansible_distribution_major_version }}-All-In-One.repo
   when:
     - containeros_cluster == true
-    - (ansible_distribution_version | float) >= 8.0
 
 ## 3/3 Config infra mirrors
 - name: Modify mirrors
   shell: |
-    sed -i "s#__download_url__#{{ download_url }}#g" /etc/yum.repos.d/CentOS-8-All-In-One.repo && yum clean all && yum makecache
+    sed -i "s#__download_url__#{{ download_url }}#g" /etc/yum.repos.d/CentOS-{{ ansible_distribution_major_version }}-All-In-One.repo && yum clean all && yum makecache
   when:
     - containeros_cluster == true
-    - (ansible_distribution_version | float) >= 8.0
 
 # CentOS ships with python installed
 
