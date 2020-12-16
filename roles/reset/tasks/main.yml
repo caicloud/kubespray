@@ -92,7 +92,7 @@
   tags:
     - crio
     - containerd
-  when: 
+  when:
     - container_manager in ["crio", "containerd"] and deploy_container_engine|default(true)
     - inventory_hostname in groups['kube-node'] or inventory_hostname in groups['kube-master']
 
@@ -334,7 +334,7 @@
 - name: reset | include file with reset tasks specific to the network_plugin if exists
   include_tasks: "{{ (role_path + '/../network_plugin/' + kube_network_plugin + '/tasks/reset.yml') | realpath  }}"
   when:
-    - kube_network_plugin in ['flannel', 'cilium', 'contiv', 'kube-router', 'calico']
+    - kube_network_plugin in ['flannel', 'cilium', 'contiv', 'kube-router', 'calico', 'bd-calico']
   tags:
     - network
 
