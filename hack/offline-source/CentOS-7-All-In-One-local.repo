@@ -11,6 +11,6 @@ gpgkey=file://__BASE__/centos/$releasever/RPM-GPG-KEY-CentOS-7
 
 [Containerd]
 name=Containerd
-baseurl=file://__BASE__/runtime/$releasever/containerd
+baseurl=file://__BASE__/runtime/containerd
 gpgcheck=0
 enabled=1
