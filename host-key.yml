@@ -26,10 +26,6 @@
 - hosts: all
   gather_facts: False
   tasks:
-    - name: Set fact
-      set_fact:
-        rsa_cert_path: "/kubespray/config/ssh_certs"
-
     - name: Gen ssh certs
       shell: |
         ssh-keygen -t rsa -f {{ rsa_cert_path }}/id_rsa  -P ""

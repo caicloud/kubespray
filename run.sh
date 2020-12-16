@@ -31,6 +31,7 @@ function ssh_certs() {
   else
     SSH_CERT_PATH="/kubespray/config/ssh_certs"
     mkdir -p ${SSH_CERT_PATH}
+    rm -rf ${SSH_CERT_PATH}/* || true
     ansible-playbook -i ${CONFIG_PATH}/inventory -e "rsa_cert_path=${SSH_CERT_PATH}" host-key.yml
   fi
   cp -f ${CONFIG_PATH}/inventory ${INVENTORY_PATH}/inventory
