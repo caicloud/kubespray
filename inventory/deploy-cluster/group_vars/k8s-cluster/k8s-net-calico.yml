@@ -3,7 +3,9 @@
 ## With calico it is possible to distributed routes with border routers of the datacenter.
 ## Warning : enabling router peering will disable calico's default behavior ('node mesh').
 ## The subnets of each nodes will be distributed by the datacenter router
-# peer_with_router: false
+peer_with_router: "{{ calico_backend == 'bird' and calico_peer_type == 'router' | default(false) | bool }}"
+
+peer_with_calico_rr: "{{ calico_backend == 'bird' and calico_peer_type == 'inCluster' | default(false) | bool }}"
 
 # Enables Internet connectivity from containers
 # nat_outgoing: true
@@ -19,6 +21,15 @@
 
 # Global as_num (/calico/bgp/v1/global/as_num)
 global_as_num: "64512"
+
+peers: >-
+  {% if calico_peers is defined %}
+  {% for peer in calico_peers %}
+  - router_id: "{{ peer }}"
+    as: "{{ global_as_num }}"
+    scope: "global"
+  {% endfor %}
+  {% endif %}
 
 # You can set MTU value here. If left undefined or empty, it will
 # not be specified in calico CNI config, so Calico will use built-in
@@ -56,14 +67,14 @@ calico_datastore: "kdd"
 
 # Set calico network backend: "bird", "vxlan" or "none"
 # bird enable BGP routing, required for ipip mode.
-calico_network_backend: vxlan
+calico_network_backend: "{{ calico_backend }}"
 
 # IP in IP and VXLAN is mutualy exclusive modes.
 # set IP in IP encapsulation mode: "Always", "CrossSubnet", "Never"
-calico_ipip_mode: 'Never'
+calico_ipip_mode: "{% if calico_backend == 'bird' %}Always{% else %}Never{% endif %}"
 
 # set VXLAN encapsulation mode: "Always", "CrossSubnet", "Never"
-calico_vxlan_mode: 'Always'
+calico_vxlan_mode: "{% if calico_backend == 'vxlan' %}Always{% else %}Never{% endif %}"
 
 # If you want to use non default IP_AUTODETECTION_METHOD for calico node set this option to one of:
 # * can-reach=DESTINATION

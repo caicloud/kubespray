@@ -229,41 +229,18 @@
       {"apiVersion": "projectcalico.org/v3",
       "kind": "BGPPeer",
       "metadata": {
-        "name": "peer-to-rrs"
+        "name": "internal-rr"
       },
       "spec": {
-        "nodeSelector": "!has(i-am-a-route-reflector)",
-        "peerSelector": "has(i-am-a-route-reflector)"
+        "nodeSelector": "all()",
+        "peerSelector": "has(node-role.kubernetes.io/master)"
       }}
   register: output
   retries: 4
   until: output.rc == 0
   delay: "{{ retry_stagger | random + 3 }}"
   with_items:
-    - "{{ groups['calico-rr'] | default([]) }}"
-  when:
-    - inventory_hostname == groups['kube-master'][0]
-    - peer_with_calico_rr|default(false)
-
-- name: Calico | Configure route reflectors to peer with each other
-  command:
-    cmd: "{{ bin_dir }}/calicoctl.sh apply -f -"
-    stdin: >
-      {"apiVersion": "projectcalico.org/v3",
-      "kind": "BGPPeer",
-      "metadata": {
-        "name": "rr-mesh"
-      },
-      "spec": {
-        "nodeSelector": "has(i-am-a-route-reflector)",
-        "peerSelector": "has(i-am-a-route-reflector)"
-      }}
-  register: output
-  retries: 4
-  until: output.rc == 0
-  delay: "{{ retry_stagger | random + 3 }}"
-  with_items:
-    - "{{ groups['calico-rr'] | default([]) }}"
+    - "{{ groups['calico-rr'] | default(groups['kube-master'], true) }}"
   when:
     - inventory_hostname == groups['kube-master'][0]
     - peer_with_calico_rr|default(false)
