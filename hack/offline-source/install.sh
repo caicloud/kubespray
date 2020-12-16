@@ -2,6 +2,9 @@
 
 set -o nounset
 set -e
+
+# Set system umask. 
+# If the operating system is security hardened and the umask value is modified, the permissions of the decompressed files will be wrong.
 umask 0022
 
 ### Color setting
