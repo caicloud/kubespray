@@ -16,8 +16,8 @@ spec:
       networkBackend: "{{ calico_network_backend }}"
 {% if calico_network_backend == "bird" %}
       rrPeerType: "{{ peer_with_router | ternary('router', 'inCluster') }}"
-      rrPeers: ""
-      asNumber: "{{ global_as_num }}"
+      rrPeers: []
+      asNumber: {{ global_as_num }}
 {% endif %}
 {% endif %}
   subnets:
