@@ -345,18 +345,3 @@ kube_scheduler_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) 
 fixedip_ipam_enabled: false
 fixedip_ipam_server_service: ""
 fixedip_ipam_server_port: 6109
-
-fixedip_ipam_version: "v1.5.0-alpha.1"
-
-fixedip_ipam_client_image_repo: "{{ docker_image_repo }}/fixedip-ipam-client"
-fixedip_ipam_client_image_tag: "{{ fixedip_ipam_version }}"
-fixedip_ipam_server_image_repo: "{{ docker_image_repo }}/fixedip-ipam-server"
-fixedip_ipam_server_image_tag: "{{ fixedip_ipam_version }}"
-
-# bridge vlan info
-bridge_vlan_image_repo: "{{ docker_image_repo }}/bridge-vlan"
-bridge_vlan_image_tag: "v1.5.0-alpha.2"
-
-# network-agent
-network_agent_image_repo: "{{ docker_image_repo }}/network-agent"
-network_agent_image_tag: "v1.5.0-alpha.2"
