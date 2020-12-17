@@ -18,8 +18,6 @@ spec:
       labels:
         k8s-app: calico-node
       annotations:
-        # Mark pod as critical for rescheduling (Will have no effect starting with kubernetes 1.12)
-        kubespray.etcd-cert/serial: "{{ etcd_client_cert_serial }}"
 {% if calico_felix_prometheusmetricsenabled %}
         prometheus.io/scrape: 'true'
         prometheus.io/port: "{{ calico_felix_prometheusmetricsport }}"
@@ -64,7 +62,7 @@ spec:
         # and CNI network config file on each node.
         - name: install-cni
           image: {{ calico_cni_image_repo }}:{{ calico_cni_image_tag }}
-          command: ["/install-cni.sh"]
+          command: ["/opt/cni/bin/install"]
           env:
             # Name of the CNI config file to create.
             - name: CNI_CONF_NAME
