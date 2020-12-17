@@ -21,7 +21,7 @@ release_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
 
 # Image version
 kube_version: v1.19.3
-calico_version: "v3.15.2"
+calico_version: "v3.17.0"
 multus_version: "v3.6"
 pod_infra_version: "3.2"
 nginx_image_tag: 1.19
