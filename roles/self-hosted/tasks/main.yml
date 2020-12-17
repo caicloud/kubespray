@@ -1,7 +1,24 @@
 # Ensure COS namespaces exist
-- name: Ensure COS namespaces exist
-  shell: |
-    kubectl get ns | grep {{ cos_running_namespaces }} || kubectl create namespace {{ cos_running_namespaces }}
+- name: Generate COS namespaces yaml
+  template:
+    src: cos-system-ns.yml.j2
+    dest: "{{ self_hosted_config_dir }}/cos-system-ns.yml"
+  when:
+    - cos_running_namespaces not in ["default", "kube-system", "kube-node-lease", "kube-public"]
+  run_once: true
+
+- name: Create COS namespaces
+  kube:
+    name: "{{ item.name }}"
+    kubectl: "{{ bin_dir }}/kubectl"
+    resource: "{{ item.type }}"
+    filename: "{{ self_hosted_config_dir }}/{{ item.file }}"
+    state: "{{ item.state }}"
+  with_items:
+    - name: "{{ cos_running_namespaces }}"
+      type: namespaces
+      file: cos-system-ns.yml
+      state: latest
   when:
     - cos_running_namespaces not in ["default", "kube-system", "kube-node-lease", "kube-public"]
   run_once: true
@@ -136,6 +153,7 @@
   with_items:
     - cluster-crd-patch.yml
   run_once: true
+  delegate_to: localhost
   when: not deploy_control_cluster
 
 # TODO: Modify kube.py, support kubectl patch
@@ -145,5 +163,5 @@
   with_items:
     - cluster-crd-patch.yml
   run_once: true
+  delegate_to: localhost
   when: not deploy_control_cluster
-
