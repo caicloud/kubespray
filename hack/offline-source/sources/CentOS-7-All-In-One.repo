@@ -1,0 +1,10 @@
+# CentOS-All-In-One.repo
+#
+# The mirror contains all files needed to deploy caicloud stack.
+
+[BaseOS]
+name=CentOS-7 - Base
+baseurl=__download_url__/centos/7
+gpgcheck=1
+enabled=1
+gpgkey=__download_url__/centos/7/RPM-GPG-KEY-CentOS-7

@@ -93,7 +93,7 @@ loadbalancer_apiserver_healthcheck_port: 8081
 # pyrepo_cert: /etc/ssl/certs/ca-certificates.crt
 
 ## Set containerd version
-containerd_version: '1.4.1'
+containerd_version: '1.4.3'
 # ContainerOS self config
 containeros_cluster: true
 ## Containerd repo

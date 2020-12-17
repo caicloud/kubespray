@@ -21,7 +21,9 @@ else
     DOWNLOAD_PATH=${DOWNLOAD_URL}/sources
 fi
 
-CONTAINERD_VERSION="1.4.1"
+SYSTEM_VERSION_ID=$(cat /etc/os-release | grep "VERSION_ID" | awk -F '=' '{print $2}' | sed 's/"//g')
+CENTOS_MIRROR_FILE_NAME="CentOS-${SYSTEM_VERSION_ID}-All-In-One.repo"
+CONTAINERD_VERSION="1.4.3"
 
 echo -e "$GREEN_COL Check system version $NORMAL_COL"
 # get system version
@@ -68,13 +70,13 @@ echo -e "$GREEN_COL Configure yum $NORMAL_COL"
 yum clean all || true
 mv /etc/yum.repos.d /etc/yum.repos.d.`date +"%Y-%m-%d-%H-%M-%S"`.bak
 mkdir -p /etc/yum.repos.d
-curl ${DOWNLOAD_PATH}/CentOS-8-All-In-One.repo -o /etc/yum.repos.d/CentOS-8-All-In-One.repo || \
-wget ${DOWNLOAD_PATH}/CentOS-8-All-In-One.repo -O /etc/yum.repos.d/CentOS-8-All-In-One.repo
+curl ${DOWNLOAD_PATH}/${CENTOS_MIRROR_FILE_NAME} -o /etc/yum.repos.d/${CENTOS_MIRROR_FILE_NAME} || \
+wget ${DOWNLOAD_PATH}/${CENTOS_MIRROR_FILE_NAME} -O /etc/yum.repos.d/${CENTOS_MIRROR_FILE_NAME}
 if [[ $? -ne 0 ]]; then
     echo -e "$RED_COL download yum repo config error, Please check download_ip !! $NORMAL_COL"
     exit 2
 fi
-sed -i "s#__download_url__#${DOWNLOAD_URL}#g" /etc/yum.repos.d/CentOS-8-All-In-One.repo
+sed -i "s#__download_url__#${DOWNLOAD_URL}#g" /etc/yum.repos.d/${CENTOS_MIRROR_FILE_NAME}
 yum clean all && yum makecache
 
 # Install containerd
