@@ -3,6 +3,8 @@ kind: ConfigMap
 metadata:
   name: "{{ system_info_cm_name }}"
   namespace: "{{ cos_running_namespaces }}"
+  labels:
+    release.containeros.dev/config-type: system-info
 data:
   clusterDeployVersion: ""
   downloadURL: "{{ download_url }}"
