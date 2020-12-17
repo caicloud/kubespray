@@ -27,6 +27,8 @@ spec:
         image: {{ network_agent_image_repo }}:{{ network_agent_image_tag }}
         imagePullPolicy: Always
         name: agent
+        args:
+        - --service-ip-range={{ kube_service_addresses }}
         resources:
           requests:
             cpu: 50m
