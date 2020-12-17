@@ -49,10 +49,11 @@
     owner: kube
   with_items:
     - "/etc/cni/net.d"
+    - "/etc/cni/multus"
     - "/opt/cni/bin"
     - "/var/lib/calico"
   when:
-    - kube_network_plugin in ["calico", "weave", "canal", "flannel", "contiv", "cilium", "kube-ovn", "ovn4nfv", "kube-router", "macvlan"]
+    - kube_network_plugin in ["calico", "weave", "canal", "flannel", "contiv", "cilium", "kube-ovn", "ovn4nfv", "kube-router", "macvlan", "bd-calico"]
     - inventory_hostname in groups['k8s-cluster']
   tags:
     - network
