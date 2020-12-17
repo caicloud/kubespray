@@ -1,0 +1,78 @@
+---
+# This file copy from roles/download/default/main.yml
+
+# registry domain config
+registry_domain: ""
+registry_project_release: "release"
+registry_project_library: "library"
+
+# gcr and kubernetes image repo define
+gcr_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
+kube_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
+
+# docker image repo define
+docker_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
+
+# quay image repo define
+quay_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
+
+# self release repo define
+release_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
+
+# Image version
+kube_version: v1.19.3
+calico_version: "v3.15.2"
+multus_version: "v3.6"
+pod_infra_version: "3.2"
+nginx_image_tag: 1.19
+dnsautoscaler_version: 1.8.1
+coredns_version: "1.6.7"
+fixedip_ipam_version: "v1.5.0-alpha.1"
+bridge_vlan_image_tag: "v1.5.0-alpha.2"
+network_agent_image_tag: "v1.5.0-alpha.2"
+
+## Download config
+image_arch: "{{host_architecture | default('amd64')}}"
+kubelet_download_url: "{{ download_url }}/files/kubelet-{{ kube_version }}-{{ image_arch }}"
+kubectl_download_url: "{{ download_url }}/files/kubectl-{{ kube_version }}-{{ image_arch }}"
+kubeadm_download_url: "{{ download_url }}/files/kubeadm-{{ kube_version }}-{{ image_arch }}"
+etcd_download_url: "{{ download_url }}/files/etcd-v3.4.13-linux-{{ image_arch }}.tar.gz"
+cni_download_url: "{{ download_url }}/files/cni-plugins-linux-{{ image_arch }}-v0.8.7.tgz"
+calico_ctl_version: "{{ calico_version }}"
+calicoctl_download_url: "{{ download_url }}/files/calicoctl-linux-{{ image_arch }}-{{ calico_ctl_version }}"
+crictl_download_url: "{{ download_url }}/files/crictl-v1.19.0-linux-{{ image_arch }}.tar.gz"
+
+# Container image
+kube_proxy_image_repo: "{{ kube_image_repo }}/kube-proxy"
+
+calico_cni_version: "{{ calico_version }}"
+calico_policy_version: "{{ calico_version }}"
+calico_node_image_repo: "{{ docker_image_repo }}/calico-node"
+calico_node_image_tag: "{{ calico_version }}"
+calico_cni_image_repo: "{{ docker_image_repo }}/calico-cni"
+calico_cni_image_tag: "{{ calico_cni_version }}"
+calico_policy_image_repo: "{{ docker_image_repo }}/calico-kube-controllers"
+calico_typha_image_tag: "{{ calico_typha_version }}"
+
+pod_infra_image_repo: "{{ kube_image_repo }}/pause"
+pod_infra_image_tag: "{{ pod_infra_version }}"
+
+multus_image_repo: "{{ docker_image_repo }}/nfvpe-multus"
+multus_image_tag: "{{ multus_version }}"
+
+nginx_image_repo: "{{ docker_image_repo }}/library-nginx"
+
+dnsautoscaler_image_repo: "{{ kube_image_repo }}/cluster-proportional-autoscaler-{{ image_arch }}"
+dnsautoscaler_image_tag: "{{ dnsautoscaler_version }}"
+
+coredns_image_repo: "{{ docker_image_repo }}/coredns-coredns"
+coredns_image_tag: "{{ coredns_version }}"
+
+fixedip_ipam_client_image_repo: "{{ docker_image_repo }}/fixedip-ipam-client"
+fixedip_ipam_client_image_tag: "{{ fixedip_ipam_version }}"
+fixedip_ipam_server_image_repo: "{{ docker_image_repo }}/fixedip-ipam-server"
+fixedip_ipam_server_image_tag: "{{ fixedip_ipam_version }}"
+
+bridge_vlan_image_repo: "{{ docker_image_repo }}/bridge-vlan"
+
+network_agent_image_repo: "{{ docker_image_repo }}/network-agent"
