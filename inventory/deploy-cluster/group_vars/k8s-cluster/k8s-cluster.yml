@@ -370,6 +370,4 @@ kubelet_config_extra_args: {
   evictionSoft: {"memory.available": "300Mi", "nodefs.available": "5%", "nodefs.inodesFree": "10", "imagefs.available": "8%", "imagefs.inodesFree": "100"},
   evictionSoftGracePeriod: {"memory.available": "30s", "nodefs.available": "1m", "nodefs.inodesFree": "1m", "imagefs.available": "2m", "imagefs.inodesFree": "2m"},
   evictionPressureTransitionPeriod: 3s,
-  tlsCertFile: "{{ kube_cert_dir }}/apiserver-kubelet-client.crt",
-  tlsPrivateKeyFile: "{{ kube_cert_dir }}/apiserver-kubelet-client.key"
 }
