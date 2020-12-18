@@ -23,6 +23,8 @@ spec:
         - env:
             - name: IPAM_LISTEN_PORT
               value: "{{ fixedip_ipam_server_port }}"
+            - name: IPAM_WEBHOOK_LISTEN_PORT
+              value: "{{ fixedip_ipam_webhook_server_port }}"
           image: {{ fixedip_ipam_server_image_repo }}:{{ fixedip_ipam_server_image_tag }}
           livenessProbe:
             failureThreshold: 3
@@ -37,6 +39,7 @@ spec:
           name: server
           ports:
             - containerPort: {{ fixedip_ipam_server_port }}
+            - containerPort: {{ fixedip_ipam_webhook_server_port }}
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -79,3 +82,6 @@ spec:
     - port: 8080
       protocol: TCP
       targetPort: {{ fixedip_ipam_server_port }}
+    - port: 8082
+      protocol: TCP
+      targetPort: {{ fixedip_ipam_webhook_server_port }}
