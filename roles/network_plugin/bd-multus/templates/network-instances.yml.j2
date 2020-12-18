@@ -16,7 +16,16 @@ spec:
       networkBackend: "{{ calico_network_backend }}"
 {% if calico_network_backend == "bird" %}
       rrPeerType: "{{ peer_with_router | ternary('router', 'inCluster') }}"
-      rrPeers: []
+      rrPeers:
+{% if peers is defined and peer_with_router %}
+{% for peer in peers %}
+      - {{ peer.router_id }}
+{% endfor %}
+{% elif peer_with_calico_rr %}
+{% for hostname in groups['kube-master'] %}
+      - {{ hostname }}
+{% endfor %}
+{% endif %}
       asNumber: {{ global_as_num }}
 {% endif %}
 {% endif %}
