@@ -110,12 +110,19 @@
   become: true
 
 # stop and disable firewalld
+- name: Check if firewalld is installd
+  shell: |
+    rpm -q firewalld
+  register: firewalld_is_install
+  ignore_errors: true
+
 - name: Stop and disable firewalld
   systemd:
     name: firewalld
     state: stopped
     enabled: false
     masked: true
+  when: firewalld_is_install.rc == 0
 
 # 1/4 Trust registry self-signed certificate
 - name: Check that the registry self-signed cerfiicate exists
