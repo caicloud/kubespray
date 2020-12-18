@@ -1,4 +1,4 @@
-# 把控下参数内容，不能添加会随意更改的东西。
+# Cannot add high-frequency modified configuration.
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -20,3 +20,4 @@ data:
 {% else %}
   cloudProvider: "generic"
 {% endif %}
+  gpuEnhancement: "{{ gpu_enhancement }}"
