@@ -1,11 +1,15 @@
 # Ensure COS namespaces exist
+- name: Ensure {{ self_hosted_config_dir }} directory exist
+  file:
+    name: "{{ self_hosted_config_dir }}"
+    state: directory
+
 - name: Generate COS namespaces yaml
   template:
     src: cos-system-ns.yml.j2
     dest: "{{ self_hosted_config_dir }}/cos-system-ns.yml"
   when:
     - cos_running_namespaces not in ["default", "kube-system", "kube-node-lease", "kube-public"]
-  run_once: true
 
 - name: Create COS namespaces
   kube:
