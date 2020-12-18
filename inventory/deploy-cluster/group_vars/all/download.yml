@@ -27,7 +27,7 @@ pod_infra_version: "3.2"
 nginx_image_tag: 1.19
 dnsautoscaler_version: 1.8.1
 coredns_version: "1.6.7"
-fixedip_ipam_version: "v1.5.0-alpha.1"
+fixedip_ipam_version: "v1.5.0-alpha.2"
 bridge_vlan_image_tag: "v1.5.0-alpha.3"
 network_agent_image_tag: "v1.5.0-alpha.3"
 

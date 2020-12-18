@@ -12,6 +12,7 @@ multus_kubeconfig_file_host: "{{ (multus_cni_conf_dir_host, '/multus.d/multus.ku
 default_network_is_fixedip: false
 
 fixedip_ipam_server_port: 9109
+fixedip_ipam_webhook_port: 9110
 
 default_network_name: k8s-pod-network
 default_network_display_name: "默认网络"
