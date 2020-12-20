@@ -26,8 +26,8 @@ if [ -f ../.install-env.sh ];then
   source ../.install-env.sh
 elif [ -f ./registry_ca_cert/registry-ca.crt ]; then
   CARGO_CFG_CA_PATH="registry_ca_cert/registry-ca.crt"
-  CARGO_CFG_DOMAIN=`cat env.yml | grep registry_domain | awk '{print $2}' | sed 's#"##g'`
-  CARGO_CFG_IP=`cat env.yml | grep registry_ip | awk '{print $2}' | sed 's#"##g'`
+  CARGO_CFG_DOMAIN=`cat env.yml | grep image_registry_domain | awk '{print $2}' | sed 's#"##g'`
+  CARGO_CFG_IP=`cat env.yml | grep image_registry_ip | awk '{print $2}' | sed 's#"##g'`
   if ! `cat /etc/hosts | grep -Eqi ${CARGO_CFG_DOMAIN}`; then
     echo "${CARGO_CFG_IP} ${CARGO_CFG_DOMAIN}" >> /etc/hosts
   fi
