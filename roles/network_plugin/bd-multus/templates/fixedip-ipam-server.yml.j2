@@ -19,10 +19,25 @@ spec:
       labels:
         app: fixedip-ipam-server
     spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - key: node-role.kubernetes.io/master
+                    operator: Exists
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchLabels:
+                  app: fixedip-ipam-server
+              topologyKey: kubernetes.io/hostname
       containers:
         - env:
             - name: IPAM_LISTEN_PORT
               value: "{{ fixedip_ipam_server_port }}"
+            - name: IPAM_WEBHOOK_LISTEN_PORT
+              value: "{{ fixedip_ipam_webhook_port }}"
           image: {{ fixedip_ipam_server_image_repo }}:{{ fixedip_ipam_server_image_tag }}
           livenessProbe:
             failureThreshold: 3
@@ -37,6 +52,7 @@ spec:
           name: server
           ports:
             - containerPort: {{ fixedip_ipam_server_port }}
+            - containerPort: {{ fixedip_ipam_webhook_port }}
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -55,8 +71,6 @@ spec:
               cpu: 50m
               memory: 200Mi
       hostNetwork: true
-      nodeSelector:
-        node-role.kubernetes.io/master: ""
       priorityClassName: system-cluster-critical
       serviceAccountName: fixedip-ipam-server
       terminationGracePeriodSeconds: 5
@@ -72,10 +86,13 @@ metadata:
   name: fixedip-ipam-server
   namespace: kube-system
 spec:
-  type: NodePort
+  type: ClusterIP
   selector:
     app: fixedip-ipam-server
   ports:
     - port: 8080
       protocol: TCP
       targetPort: {{ fixedip_ipam_server_port }}
+    - port: 8443
+      protocol: TCP
+      targetPort: {{ fixedip_ipam_webhook_port }}

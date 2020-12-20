@@ -24,6 +24,16 @@ rules:
       - list
       - watch
   - apiGroups:
+      - admissionregistration.k8s.io
+    resources:
+      - validatingwebhookconfigurations
+    verbs:
+      - create
+      - update
+      - get
+      - list
+      - watch
+  - apiGroups:
       - ""
     resources:
       - pods
@@ -41,6 +51,7 @@ rules:
       - watch
       - list
       - get
+      - update
   - apiGroups:
       - apps
     resources:
@@ -51,6 +62,7 @@ rules:
       - watch
       - list
       - get
+      - update
   - apiGroups:
       - policy
     resources:

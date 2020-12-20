@@ -344,4 +344,7 @@ kube_scheduler_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) 
 # fixedip-ipam server config
 fixedip_ipam_enabled: false
 fixedip_ipam_server_service: ""
-fixedip_ipam_server_port: 6109
+
+# fixedip-ipam service port
+fixedip_ipam_server_port: 9109
+fixedip_ipam_webhook_port: 9110
