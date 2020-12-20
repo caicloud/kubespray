@@ -32,7 +32,7 @@
     create: yes
     backup: yes
     unsafe_writes: yes
-    marker: "# Cargo server {mark}"
+    marker: "# registry server {mark}"
 
 - name: Hosts | populate kubernetes loadbalancer address into hosts file
   lineinfile:

@@ -133,7 +133,7 @@
 
 - name: Set fact false, if it doesnt exist already
   set_fact:
-    cargo_ca_self_sign: "{{ stat_result.stat.exists }}"
+    registry_ca_self_sign: "{{ stat_result.stat.exists }}"
 
 # 2/4 Trust registry self-signed certificate
 - name: Enable ca configuration
