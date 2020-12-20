@@ -19,6 +19,18 @@
     dest: "{{ kube_config_dir }}/webhook-authorization-config.yaml"
   when: kube_webhook_authorization|default(false)
 
+- name: Create addminssion control config
+  template:
+    src: admission-control.yml.j2
+    dest: "{{ kube_config_dir }}/admission-control.yml"
+  when: "'EventRateLimit' in {{ kube_apiserver_enable_admission_plugins }}"
+
+- name: Create event config file
+  template:
+    src: eventconfig.yml.j2
+    dest: "{{ kube_config_dir }}/eventconfig.yml"
+  when: "'EventRateLimit' in {{ kube_apiserver_enable_admission_plugins }}"
+
 - import_tasks: encrypt-at-rest.yml
   when:
     - kube_encrypt_secret_data
