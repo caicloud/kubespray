@@ -74,6 +74,7 @@
   retries: 5
   until: remove_all_cri_containers.rc == 0
   delay: 5
+  ignore_errors: True
   tags:
     - crio
     - containerd
@@ -89,6 +90,7 @@
   retries: 5
   until: remove_all_cri_containers.rc == 0
   delay: 5
+  ignore_errors: True
   tags:
     - crio
     - containerd
@@ -104,6 +106,8 @@
   retries: 5
   until: remove_all_cri_containers.rc == 0
   delay: 5
+# TODO: [Temporary solution] Confirm the reason for the failed removal and try to repair it
+  ignore_errors: True
   tags:
     - crio
     - containerd
@@ -119,6 +123,8 @@
   retries: 5
   until: remove_all_cri_containers.rc == 0
   delay: 5
+# TODO: [Temporary solution] Confirm the reason for the failed removal and try to repair it
+  ignore_errors: True
   tags:
     - crio
     - containerd
