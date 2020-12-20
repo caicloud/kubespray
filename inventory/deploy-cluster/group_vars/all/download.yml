@@ -52,7 +52,7 @@ calico_node_image_tag: "{{ calico_version }}"
 calico_cni_image_repo: "{{ docker_image_repo }}/calico-cni"
 calico_cni_image_tag: "{{ calico_cni_version }}"
 calico_policy_image_repo: "{{ docker_image_repo }}/calico-kube-controllers"
-calico_typha_image_tag: "{{ calico_typha_version }}"
+calico_policy_image_tag: "{{ calico_policy_version }}"
 
 pod_infra_image_repo: "{{ kube_image_repo }}/pause"
 pod_infra_image_tag: "{{ pod_infra_version }}"
