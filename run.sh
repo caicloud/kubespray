@@ -35,7 +35,7 @@ function ssh_certs() {
     ansible-playbook -i ${CONFIG_PATH}/inventory -e "rsa_cert_path=${SSH_CERT_PATH}" host-key.yml
   fi
   cp -f ${CONFIG_PATH}/inventory ${INVENTORY_PATH}/inventory
-  sed -i "s#ansible_ssh_pass=[^\s]*#ansible_ssh_private_key_file=${SSH_CERT_PATH}/id_rsa#g" ${INVENTORY_PATH}/inventory
+  sed -i "s#ansible_ssh_pass=[^ ]*#ansible_ssh_private_key_file=${SSH_CERT_PATH}/id_rsa#g" ${INVENTORY_PATH}/inventory
 }
 
 # Copy from config path
