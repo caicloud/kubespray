@@ -80,15 +80,11 @@ case $input in
     reset_nodes=false
     echo -e "${GREEN_COL}       ############ Start remove work node ###############       ${NORMAL_COL}"
     # about 3mins
-    if [[ -n $3 ]] && [[ x$3 = "xnot-reset" ]]; then
-      ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
-        -e node=${NODE_NAME} -e delete_nodes_confirmation=yes -e reset_nodes=false \
-        remove-node.yml
-    else
-      ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
-        -e node=${NODE_NAME} -e delete_nodes_confirmation=yes
-        remove-node.yml
-    fi
+    EXTERNEL_CONFIG=""
+    [[ $# == "3" ]] && [[ x$3 == "xnot-reset" ]] && EXTERNEL_CONFIG="-e reset_nodes=false" || true
+    ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
+      -e node=${NODE_NAME} -e delete_nodes_confirmation=yes ${EXTERNEL_CONFIG} \
+      remove-node.yml
     ;;
   add-master )
     echo -e "${GREEN_COL}       ############ Start add master node ################       ${NORMAL_COL}"
@@ -100,15 +96,11 @@ case $input in
   remove-master )
     NODE_NAME=$2
     echo -e "${GREEN_COL}       ############ Start remove master node #############       ${NORMAL_COL}"
-    if [[ -n $3 ]] && [[ x$3 = "xnot-reset" ]]; then
-      ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
-        -e node=${NODE_NAME} -e delete_nodes_confirmation=yes -e reset_nodes=false \
-        remove-node.yml
-    else
-      ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
-        -e node=${NODE_NAME} -e delete_nodes_confirmation=yes \
-        remove-node.yml
-    fi
+    EXTERNEL_CONFIG=""
+    [[ $# == "3" ]] && [[ x$3 == "xnot-reset" ]] && EXTERNEL_CONFIG="-e reset_nodes=false" || true
+    ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
+      -e node=${NODE_NAME} -e delete_nodes_confirmation=yes ${EXTERNEL_CONFIG} \
+      remove-node.yml
     ;;
   add-etcd )
     echo -e "${GREEN_COL}       ############ Start add etcd node ##################       ${NORMAL_COL}"
@@ -126,15 +118,11 @@ case $input in
     NODE_NAME=$2
     echo -e "${GREEN_COL}       ############ Start remove etcd node ###############       ${NORMAL_COL}"
     # remove etcd node
-    if [[ -n $3 ]] && [[ x$3 = "xnot-reset" ]]; then
-      ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
-        -e node="${NODE_NAME}" -e delete_nodes_confirmation=yes -e reset_nodes=false \
-        remove-node.yml
-    else 
-      ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
-        -e node=\"${NODE_NAME}\" -e delete_nodes_confirmation=yes \
-        remove-node.yml
-    fi
+    EXTERNEL_CONFIG=""
+    [[ $# == "3" ]] && [[ x$3 == "xnot-reset" ]] && EXTERNEL_CONFIG="-e reset_nodes=false" || true
+    ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
+      -e node="${NODE_NAME}" -e delete_nodes_confirmation=yes ${EXTERNEL_CONFIG} \
+      remove-node.yml
 
     # modify etcd node message
     sed -i "${NODE_NAME}/d" ${INVENTORY_PATH}/inventory
