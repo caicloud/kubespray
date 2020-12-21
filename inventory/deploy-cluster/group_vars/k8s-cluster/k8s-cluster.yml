@@ -330,7 +330,7 @@ tls_cipher_suites:
 event_ttl_duration: "1h0m0s"
 
 ## Set dns record to resolve registry domain name
-dns_etchosts: "{{ registry_ip }} {{ registry_domain }}"
+dns_etchosts: "{{ image_registry_ip }} {{ image_registry_domain }}"
 
 
 ## Kubeadm config for containeros OEM

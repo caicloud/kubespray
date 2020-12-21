@@ -124,30 +124,30 @@
     masked: true
   when: firewalld_is_install.rc == 0
 
-# 1/4 Trust registry self-signed certificate
+# 1/4 Trust image registry self-signed certificate
 - name: Check that the registry self-signed cerfiicate exists
   stat:
-    path: "{{ registry_signed_certificate }}"
+    path: "{{ image_registry_signed_certificate }}"
   register: stat_result
   delegate_to: localhost
 
 - name: Set fact false, if it doesnt exist already
   set_fact:
-    cargo_ca_self_sign: "{{ stat_result.stat.exists }}"
+    image_registry_ca_self_sign: "{{ stat_result.stat.exists }}"
 
-# 2/4 Trust registry self-signed certificate
+# 2/4 Trust image registry self-signed certificate
 - name: Enable ca configuration
   shell: update-ca-trust force-enable
-  when: registry_ca_self_sign
+  when: image_registry_ca_self_sign
 
-# 3/4 Trust registry self-signed certificate
+# 3/4 Trust image registry self-signed certificate
 - name: Copy crt to certificate file
   copy:
-    src: "{{ registry_signed_certificate }}"
+    src: "{{ image_registry_signed_certificate }}"
     dest: "/etc/pki/ca-trust/source/anchors/registry-ca.crt"
-  when: registry_ca_self_sign
+  when: image_registry_ca_self_sign
 
-# 4/4 Trust registry self-signed certificate
+# 4/4 Trust image registry self-signed certificate
 - name: Update certificate
   shell: update-ca-trust
-  when: registry_ca_self_sign
+  when: image_registry_ca_self_sign

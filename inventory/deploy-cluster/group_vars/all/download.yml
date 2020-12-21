@@ -1,23 +1,23 @@
 ---
 # This file copy from roles/download/default/main.yml
 
-# registry domain config
-registry_domain: ""
-registry_project_release: "release"
-registry_project_library: "library"
+# image registry domain config
+image_registry_domain: ""
+image_registry_project_release: "release"
+image_registry_project_library: "library"
 
 # gcr and kubernetes image repo define
-gcr_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
-kube_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
+gcr_image_repo: "{{ image_registry_domain }}/{{ image_registry_project_release }}"
+kube_image_repo: "{{ image_registry_domain }}/{{ image_registry_project_release }}"
 
 # docker image repo define
-docker_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
+docker_image_repo: "{{ image_registry_domain }}/{{ image_registry_project_release }}"
 
 # quay image repo define
-quay_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
+quay_image_repo: "{{ image_registry_domain }}/{{ image_registry_project_release }}"
 
 # self release repo define
-release_image_repo: "{{ registry_domain }}/{{ registry_project_release }}"
+release_image_repo: "{{ image_registry_domain }}/{{ image_registry_project_release }}"
 
 # Image version
 kube_version: v1.19.3

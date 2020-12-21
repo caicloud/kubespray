@@ -27,12 +27,12 @@
 - name: Hosts | populate inventory into hosts file
   blockinfile:
     path: /etc/hosts
-    block: "{{ registry_ip }} {{ registry_domain }}"
+    block: "{{ image_registry_ip }} {{ image_registry_domain }}"
     state: present
     create: yes
     backup: yes
     unsafe_writes: yes
-    marker: "# Cargo server {mark}"
+    marker: "# image registry server {mark}"
 
 - name: Hosts | populate kubernetes loadbalancer address into hosts file
   lineinfile:
