@@ -52,7 +52,9 @@ spec:
           name: server
           ports:
             - containerPort: {{ fixedip_ipam_server_port }}
+              name: server
             - containerPort: {{ fixedip_ipam_webhook_port }}
+              name: webhook
           readinessProbe:
             failureThreshold: 3
             httpGet:
@@ -90,10 +92,12 @@ spec:
   selector:
     app: fixedip-ipam-server
   ports:
-    - port: 8080
+    - name: server
+      port: 8080
       protocol: TCP
       targetPort: {{ fixedip_ipam_server_port }}
-    - port: 8443
+    - name: webhook
+      port: 8443
       protocol: TCP
       targetPort: {{ fixedip_ipam_webhook_port }}
 ---
