@@ -1,7 +1,7 @@
 ---
 # This file copy from roles/download/default/main.yml
 
-# registry domain config
+# image registry domain config
 image_registry_domain: ""
 image_registry_project_release: "release"
 image_registry_project_library: "library"
