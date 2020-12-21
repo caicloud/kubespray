@@ -102,8 +102,8 @@ containeros_cluster: true
 docker_rh_repo_base_url: "{{ download_url }}/runtime/containerd"
 docker_rh_repo_gpgkey: ""
 
-## registry certs file path
-registry_signed_certificate: "/kubespray/config/registry_ca_cert/registry-ca.crt"
+## image registry certs file path
+image_registry_signed_certificate: "/kubespray/config/registry_ca_cert/registry-ca.crt"
 
 # The var defines whether deploy a control stack
 deploy_control_cluster: true
