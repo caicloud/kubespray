@@ -17,7 +17,11 @@ DEPLOY_ROOT=$(cd $(dirname "${BASH_SOURCE}")/ && pwd -P)
 CONFIG_DIR=${DEPLOY_ROOT}/.config
 SSH_CERT_DIR=${DEPLOY_ROOT}/ssh_cert
 DEPLOY_CONTAINER_NAME="cluster-deploy-job"
-REGISTRY_AUTH=`cat env.yml | grep registry_auth | awk '{print $2}' | sed 's#"##g'`
+IMAGE_SYNC_WORK_DIR="${DEPLOY_ROOT}/resources/images/data"
+TOOLS_DIR="${DEPLOY_ROOT}/resources/bin"
+IMGAE_SYNC_DIR="${DEPLOY_ROOT}/resources/images/tmp"
+REGISTRY_AUTH_USERNAME=`cat env.yml | grep image_registry_username | awk '{print $2}' | sed 's#"##g'`
+REGISTRY_AUTH_PASSWORD=`cat env.yml | grep image_registry_password | awk '{print $2}' | sed 's#"##g'`
 
 mkdir -p ${CONFIG_DIR}/registry_ca_cert
 
@@ -54,24 +58,32 @@ fi
 cp inventory ${CONFIG_DIR}
 cp env.yml ${CONFIG_DIR}
 cp -r ${SSH_CERT_DIR} ${CONFIG_DIR}
-cp -r ${CARGO_CFG_CA_PATH} ${CONFIG_DIR}/registry_ca_cert
+cp ${CARGO_CFG_CA_PATH} ${CONFIG_DIR}/registry_ca_cert/registry-ca.crt
 
-function push_image() {
-  ctr i tag ${IMAGE_FALL_NAME} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME} || true
-  if [[ ${REGISTRY_AUTH} == "" ]]; then
-    ctr i push ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME}
-  else
-    ctr i push -u ${REGISTRY_AUTH} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME}
-  fi
-}
-
-function initializ() {
-  ALL_IMAGE_FILE_LIST=`find ./resources/images/data -type f -name "*.tar.gz"`
-  for IMAGE_FILE_PATH in ${ALL_IMAGE_FILE_LIST}; do
-    IMAGE_FALL_NAME=`ctr i import ${IMAGE_FILE_PATH} | awk '{print $2}'`
-    IMAGE_NAME=`echo ${IMAGE_FALL_NAME} | awk -F '/cluster-deploy/' '{print $NF}'`
-    push_image
+# syncImages sync the images to registry
+function sync_images() {
+  echo -e "$YELLOW_COL load images $NORMAL_COL"
+  cd ${IMAGE_SYNC_WORK_DIR}
+  rm -rf "${IMGAE_SYNC_DIR}/*" || true
+  ${TOOLS_DIR}/skopeo login ${CARGO_CFG_DOMAIN} -u "${REGISTRY_AUTH_USERNAME}" -p "${REGISTRY_AUTH_PASSWORD}"
+  BLOB_DIR="docker/registry/v2/blobs/sha256"
+  REPO_DIR="docker/registry/v2/repositories"
+  for image in $(find ${REPO_DIR} -type d -name "current"); do
+    name=$(echo ${image} | awk -F '/' '{print $5"/"$6":"$9}')
+    link=$(cat ${image}/link | sed 's/sha256://')
+    mfs="${BLOB_DIR}/${link:0:2}/${link}/data"
+    mkdir -p "${IMGAE_SYNC_DIR}/${name}" && ln ${mfs} ${IMGAE_SYNC_DIR}/${name}/manifest.json
+    layers=$(grep -Eo "\b[a-f0-9]{64}\b" ${mfs} | sort -n | uniq)
+    for layer in ${layers}; do
+      ln ${BLOB_DIR}/${layer:0:2}/${layer}/data ${IMGAE_SYNC_DIR}/${name}/${layer}
+    done
   done
+  for project in $(ls ${IMGAE_SYNC_DIR}); do
+    ${TOOLS_DIR}/skopeo sync --insecure-policy --src-tls-verify=false --dest-tls-verify=false \
+    --src dir --dest docker ${IMGAE_SYNC_DIR}/${project} ${CARGO_CFG_DOMAIN}/${project} > /dev/null
+  done
+  rm -rf "${IMGAE_SYNC_DIR}"
+  cd ${DEPLOY_ROOT}
 }
 
 # Load dependence image
@@ -82,7 +94,8 @@ function load_deploy_image() {
 
 function push_deploy_image() {
   IMAGE_NAME=`echo ${IMAGE_FALL_NAME} | awk -F '/cluster-deploy/' '{print $NF}'`
-  push_image
+  ctr i tag ${IMAGE_FALL_NAME} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME} || true
+  ctr i push -u ${REGISTRY_AUTH_USERNAME}:${REGISTRY_AUTH_PASSWORD} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME}
 }
 
 function cluster_deploy() {
@@ -102,7 +115,7 @@ function cluster_deploy() {
 case $input in
   install )
     echo -e "$GREEN_COL start install compass kernel $NORMAL_COL"
-    initializ
+    sync_images
     load_deploy_image
     push_deploy_image
     COMMAND="bash run.sh install"
@@ -144,7 +157,7 @@ case $input in
     ;;
   init )
     echo -e "$GREEN_COL start init package and load image $NORMAL_COL"
-    initializ
+    sync_images
     load_deploy_image
     push_deploy_image
     ;;
