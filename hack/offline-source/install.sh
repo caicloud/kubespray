@@ -89,6 +89,10 @@ systemctl restart containerd >/dev/null 2>&1
 systemctl enable containerd >/dev/null 2>&1
 echo -e "${YELLOW_COL} done ${NORMAL_COL}"
 
+# Install kubectl
+kube_file=$(ls ${COMMON_MIRROR_DIR}/files | grep -Eo "kubectl-v[0-9]\.[0-9][0-9]\.[0-9]-.*" | sort -nr | head -n1)
+cp -f ${COMMON_MIRROR_DIR}/files/${kube_file} /usr/bin/kubectl && chmod +x /usr/bin/kubectl
+
 ## TODO：Check containerd status
 
 # Load images
