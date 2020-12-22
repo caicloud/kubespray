@@ -46,7 +46,7 @@ data:
     {{ hostname }}:
       address: {{ hostvars[hostname]['ansible_host'] }}
       auth:
-        key: "login-config-ssh-global"
+        key: "ssh-login-config"
         user: {{ hostvars[hostname]['ansible_user'] }}
         port: {{ ansible_port }}
       isEtcd: {{ hostname in groups['etcd'] | lower }}
