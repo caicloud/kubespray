@@ -8,23 +8,21 @@ metadata:
 spec:
   type: "calico"
   isDefaultNetwork: true
-  isFixedIP: {{ default_network_is_fixedip }}
-  ipRecycleTimeout: {{ default_network_ip_recycle_timeout }}
+  isFixedIP: {{ fixedip_enabled | bool }}
+  ipRecycleTimeout: {{ recycle_enabled | ternary(0, -1) }}
   cni:
 {% if kube_network_plugin == "bd-calico" %}
     calico:
       networkBackend: "{{ calico_network_backend }}"
 {% if calico_network_backend == "bird" %}
       rrPeerType: "{{ peer_with_router | ternary('router', 'inCluster') }}"
-      rrPeers:
 {% if peers is defined and peer_with_router %}
+      rrPeers:
 {% for peer in peers %}
       - {{ peer.router_id }}
 {% endfor %}
 {% elif peer_with_calico_rr %}
-{% for hostname in groups['kube-master'] %}
-      - {{ hostname }}
-{% endfor %}
+      rrPeers: []
 {% endif %}
       asNumber: {{ global_as_num }}
 {% endif %}
