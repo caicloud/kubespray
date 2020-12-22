@@ -25,6 +25,8 @@ PACKAGE_SOURCE_CONTAINERD_NAME="offline-source-nginx"
 CONTAINERD_VERSION="1.4.3"
 SYSTEM_VERSION_ID=$(cat /etc/os-release | grep "VERSION_ID" | awk -F '=' '{print $2}' | sed 's/"//g')
 CENTOS_MIRROR_FILE_NAME="CentOS-${SYSTEM_VERSION_ID}-All-In-One-local.repo"
+CHECK_URL="http://localhost:3142/centos/7/repodata/repomd.xml"
+HEALTH_CHECK_DIR="${COMMON_ROOT}/health-check"
 
 echo -e "$GREEN_COL Check system version $NORMAL_COL"
 # get system version
@@ -89,8 +91,6 @@ systemctl restart containerd >/dev/null 2>&1
 systemctl enable containerd >/dev/null 2>&1
 echo -e "${YELLOW_COL} done ${NORMAL_COL}"
 
-## TODO：Check containerd status
-
 # Load images
 CABIN_NGINX_IMAGE=`find ${PACKAGE_SOURCE_ROOT}/resources/images/save -name '*.tar.gz' -type f | xargs -I {} ctr i import {} | awk '{print $2}'`
 
@@ -110,14 +110,33 @@ ctr run -d --net-host \
   --mount type=bind,src=${COMMON_MIRROR_DIR},dst=/usr/share/nginx/html,options=rbind:r \
   ${CABIN_NGINX_IMAGE} ${PACKAGE_SOURCE_CONTAINERD_NAME}
 
+# Check containerd status
+function health_check_config() {
+  mkdir -p ${HEALTH_CHECK_DIR}
+  :>${HEALTH_CHECK_DIR}/offline-source-variable.conf
+  cp -f offline-source-health-check.sh ${HEALTH_CHECK_DIR}
+
+  HEALTH_CHECK_VARIABLE_LIST="CABIN_NGINX_IMAGE PACKAGE_SOURCE_CONTAINERD_NAME COMMON_MIRROR_DIR PACKAGE_SOURCE_ROOT CHECK_URL PACKAGE_SOURCE_NGINX_LOG_FILE HEALTH_CHECK_DIR"
+
+  for i in ${HEALTH_CHECK_VARIABLE_LIST}; do
+    eval value="$"${i}
+    echo "${i}=${value}" >> ${HEALTH_CHECK_DIR}/offline-source-variable.conf
+  done
+
+  # set crontab
+  crontab -l > conf && echo "* * * * * bash ${HEALTH_CHECK_DIR}/offline-source-health-check.sh ${HEALTH_CHECK_DIR}" >> conf && crontab conf && rm -f conf
+}
+
 ## Check package source package installation..
 while true;do
   echo -e "$GREEN_COL Check offline source installation.. $NORMAL_COL"
-  health_check=`curl -I -o /dev/null -s -w %{http_code}  http://localhost:3142/centos/7/repodata/repomd.xml`
+  health_check=`curl -I -o /dev/null -s -w %{http_code} ${CHECK_URL}`
   sleep 1
   if [ $health_check == 200 ];then
-     echo -e "$GREEN_COL ... OK, will quit. $NORMAL_COL"
-     exit 0
+    echo -e "$GREEN_COL ... OK, start config health check $NORMAL_COL"
+    health_check_config
+    echo -e "$GREEN_COL ... Finish, will quit. $NORMAL_COL"
+    exit 0
   else
     echo -e "$GREEN_COL ... Not OK, will retry, press ctrl-C to quit. $NORMAL_COL"
   fi
