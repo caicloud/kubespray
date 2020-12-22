@@ -44,12 +44,12 @@ fi
 if [ -f ${SSH_CERT_DIR}/id_rsa ]; then
   chmod 600 ${SSH_CERT_DIR}/id_rsa
   if [ $? -ne 0 ]; then
-    echo -e "$RED_COL chmod error please check ./ssh_certs/id_ras $NORMAL_COL"
+    echo -e "$RED_COL chmod error please check ./ssh_certs/id_rsa $NORMAL_COL"
     exit 1
   fi
   chmod 644 ${SSH_CERT_DIR}/id_rsa.pub
   if [ $? -ne 0 ]; then
-    echo -e "$RED_COL chmod error please check ./ssh_certs/id_ras.pub $NORMAL_COL"
+    echo -e "$RED_COL chmod error please check ./ssh_certs/id_rsa.pub $NORMAL_COL"
     exit 1
   fi
 fi
@@ -64,7 +64,7 @@ cp ${CARGO_CFG_CA_PATH} ${CONFIG_DIR}/registry_ca_cert/registry-ca.crt
 function sync_images() {
   echo -e "$YELLOW_COL load images $NORMAL_COL"
   cd ${IMAGE_SYNC_WORK_DIR}
-  rm -rf "${IMGAE_SYNC_DIR}/*" || true
+  rm -rf "${IMGAE_SYNC_DIR}" || mkdir -p ${IMGAE_SYNC_DIR}
   ${TOOLS_DIR}/skopeo login ${CARGO_CFG_DOMAIN} -u "${REGISTRY_AUTH_USERNAME}" -p "${REGISTRY_AUTH_PASSWORD}"
   BLOB_DIR="docker/registry/v2/blobs/sha256"
   REPO_DIR="docker/registry/v2/repositories"
@@ -95,7 +95,7 @@ function load_deploy_image() {
 function push_deploy_image() {
   IMAGE_NAME=`echo ${IMAGE_FALL_NAME} | awk -F '/cluster-deploy/' '{print $NF}'`
   ctr i tag ${IMAGE_FALL_NAME} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME} || true
-  ctr i push -u ${REGISTRY_AUTH_USERNAME}:${REGISTRY_AUTH_PASSWORD} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME}
+  ctr i push -u ${REGISTRY_AUTH_USERNAME}:${REGISTRY_AUTH_PASSWORD} ${CARGO_CFG_DOMAIN}/release/${IMAGE_NAME}
 }
 
 function cluster_deploy() {
@@ -114,7 +114,7 @@ function cluster_deploy() {
 
 case $input in
   install )
-    echo -e "$GREEN_COL start install compass kernel $NORMAL_COL"
+    echo -e "$GREEN_COL start deploy kubernetes cluster $NORMAL_COL"
     sync_images
     load_deploy_image
     push_deploy_image
@@ -124,20 +124,20 @@ case $input in
     cp ${CONFIG_DIR}/kubectl.kubeconfig ../.kubectl.kubeconfig
     ;;
   remove )
-    echo -e "$GREEN_COL remove compass kernel  $NORMAL_COL"
+    echo -e "$GREEN_COL remove kubernetes cluster and all platform data $NORMAL_COL"
     load_deploy_image
     COMMAND="bash run.sh remove"
     cluster_deploy "${COMMAND}"
     ;;
   add-node )
-    echo -e "$GREEN_COL add compass node  $NORMAL_COL"
+    echo -e "$GREEN_COL add kubernetes node  $NORMAL_COL"
     NODE_NAME=$2
     load_deploy_image
     COMMAND="bash run.sh add-node ${NODE_NAME}"
     cluster_deploy "${COMMAND}"
     ;;
   remove-node )
-    echo -e "$GREEN_COL remove compass node  $NORMAL_COL"
+    echo -e "$GREEN_COL remove kubernetes node  $NORMAL_COL"
     NODE_NAME=$2
     load_deploy_image
     COMMAND="bash run.sh remove-node ${NODE_NAME}"
@@ -162,7 +162,7 @@ case $input in
     push_deploy_image
     ;;
   debug )
-    echo -e "$GREEN_COL run compass debug mode $NORMAL_COL"
+    echo -e "$GREEN_COL run k8s-installer debug mode $NORMAL_COL"
     load_deploy_image
     COMMAND="bash"
     cluster_deploy "${COMMAND}"
