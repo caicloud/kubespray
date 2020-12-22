@@ -14,3 +14,9 @@ data:
   serviceIPRange: "{{ kube_service_addresses }}"
   dnsIP: "{{ skydns_server }}"
   dnsDomain: "{{ cluster_name }}"
+  clusterIdentityName: "{{ cluster_identity_name }}"
+{% if cloud_provider is defined %}
+  cloudProvider: "{{ cloud_provider }}"
+{% else %}
+  cloudProvider: "generic"
+{% endif %}
