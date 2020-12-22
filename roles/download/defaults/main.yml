@@ -119,6 +119,9 @@ crictl_checksums:
 
 # Checksums
 kubelet_checksums:
+  enhancement:
+    amd64:
+      v1.19.3: 28445247522495b8ffa29ac4d13279830691189ff2bde2f8a794b444dfb6f7ec
   arm:
     v1.19.3: 3c0214d2d583440233b6bd0088614fe4fb5748e5b153f2ec96d72d3f8165e214
     v1.19.2: 631e686c34911a40a798817dcff89532c88bb649885f93ec66b339e227ebd974
@@ -401,7 +404,12 @@ calicoctl_binary_checksums:
 
 etcd_binary_checksum: "{{ etcd_binary_checksums[image_arch] }}"
 cni_binary_checksum: "{{ cni_binary_checksums[image_arch] }}"
-kubelet_binary_checksum: "{{ kubelet_checksums[image_arch][kube_version] }}"
+kubelet_binary_checksum: >-
+  {%- if gpu_enhancement | lower == "true" -%}
+  {{ kubelet_checksums.enhancement[image_arch][kube_version] }}
+  {%- else -%}
+  {{ kubelet_checksums[image_arch][kube_version] }}
+  {%- endif -%}
 kubectl_binary_checksum: "{{ kubectl_checksums[image_arch][kube_version] }}"
 kubeadm_binary_checksum: "{{ kubeadm_checksums[image_arch][kubeadm_version] }}"
 calicoctl_binary_checksum: "{{ calicoctl_binary_checksums[image_arch][calico_ctl_version] }}"
