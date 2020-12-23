@@ -25,7 +25,7 @@
       state: latest
   when:
     - cos_running_namespaces not in ["default", "kube-system", "kube-node-lease", "kube-public"]
-  run_once: true
+    - inventory_hostname in groups['kube-master'][0]
 
 # Ensure self-hosted config dir exist
 - name: Ensure self-hosted config dir exist
@@ -53,12 +53,14 @@
   template:
     src: ssh_secret.yml.j2
     dest: "{{ self_hosted_config_dir }}/ssh_secret.yml"
-  run_once: true
+  when:
+    - inventory_hostname in groups['kube-master'][0]
 
 - name: Create secret for ssh identification
   shell: |
     kubectl apply -f {{ self_hosted_config_dir }}/ssh_secret.yml
-  run_once: true
+  when:
+    - inventory_hostname in groups['kube-master'][0]
 
 - name: Copy image registry cert to master node
   copy:
@@ -70,15 +72,17 @@
   shell: |
     kubectl -n {{ cos_running_namespaces }} delete secret registry-ca-cert || true && \
     kubectl -n {{ cos_running_namespaces }} create secret generic registry-ca-cert --from-file={{ kube_config_dir }}/registry-ca.crt
-  when: image_registry_ca_self_sign
-  run_once: true
+  when:
+    - image_registry_ca_self_sign
+    - inventory_hostname in groups['kube-master'][0]
 
 - name: Create empty secret for image registry ca cert
   shell: |
     kubectl -n {{ cos_running_namespaces }} delete secret registry-ca-cert || true && \
     kubectl -n {{ cos_running_namespaces }} create secret generic registry-ca-cert
-  when: not image_registry_ca_self_sign
-  run_once: true
+  when:
+    - not image_registry_ca_self_sign
+    - inventory_hostname in groups['kube-master'][0]
 
 # Fetch the kubeconfig file from cluster master node
 - name: Fetch kubeconfig from master
@@ -87,13 +91,15 @@
     dest: "{{ local_kubeconfig_file }}"
     flat: true
     validate_checksum: no
-  run_once: true
+  when:
+    - inventory_hostname in groups['kube-master'][0]
 
 - name: Read kubeconfig file
   include_vars:
     file: "{{ local_kubeconfig_file }}"
   register: kubeConfigFile
-  run_once: true
+  when:
+    - inventory_hostname in groups['kube-master'][0]
 
 # Create system-info, cluster-config-info configmap
 - name: Generate system-info config map
@@ -103,8 +109,9 @@
   with_items:
     - system-info-cm.yml
     - cluster-config-info-cm.yml
-  when: deploy_control_cluster
-  run_once: true
+  when:
+    - deploy_control_cluster
+    - inventory_hostname in groups['kube-master'][0]
 
 - name: Apply cm system-info to cluster
   kube:
@@ -120,8 +127,9 @@
     - name: cluster-config-info
       type: cm
       file: cluster-config-info-cm.yml
-  run_once: true
-  when: deploy_control_cluster
+  when:
+    - deploy_control_cluster
+    - inventory_hostname in groups['kube-master'][0]
 
 # Create cluster-info configmap
 - name: Generate cluster-info config map
@@ -130,7 +138,8 @@
     dest: "{{ kube_config_dir }}/{{ item }}"
   with_items:
     - cluster-info-cm.yml
-  run_once: true
+  when:
+    - inventory_hostname in groups['kube-master'][0]
 
 - name: Apply cm cluster-info to cluster
   kube:
@@ -143,7 +152,8 @@
     - name: cluster-info
       type: cm
       file: cluster-info-cm.yml
-  run_once: true
+  when:
+    - inventory_hostname in groups['kube-master'][0]
 
 # # Create VIP
 # - name: Create VIP
@@ -156,9 +166,10 @@
     dest: "{{ kube_config_dir }}/{{ item }}"
   with_items:
     - cluster-crd-patch.yml
-  run_once: true
   delegate_to: localhost
-  when: not deploy_control_cluster
+  when:
+    - not deploy_control_cluster
+    - inventory_hostname in groups['kube-master'][0]
 
 # TODO: Modify kube.py, support kubectl patch
 - name: Upgrade {{ cluster_identity_name }} cluster cr message
@@ -166,6 +177,7 @@
     kubectl -n {{ cos_running_namespaces }} patch cluster {{ cluster_identity_name }} -p "$(cat {{ kube_config_dir }}/{{ item }})"
   with_items:
     - cluster-crd-patch.yml
-  run_once: true
   delegate_to: localhost
-  when: not deploy_control_cluster
+  when:
+    - not deploy_control_cluster
+    - inventory_hostname in groups['kube-master'][0]
