@@ -27,6 +27,8 @@ SYSTEM_VERSION_ID=$(cat /etc/os-release | grep "VERSION_ID" | awk -F '=' '{print
 CENTOS_MIRROR_FILE_NAME="CentOS-${SYSTEM_VERSION_ID}-All-In-One-local.repo"
 CHECK_URL="http://localhost:3142/centos/7/repodata/repomd.xml"
 HEALTH_CHECK_DIR="${COMMON_ROOT}/health-check"
+LOG_PATH="${HEALTH_CHECK_DIR}/health_check_log"
+LOG_FILE="${LOG_PATH}/health_check_file_`date +%y-%m-%d`.log"
 
 echo -e "$GREEN_COL Check system version $NORMAL_COL"
 # get system version
@@ -86,7 +88,9 @@ yum clean all >> /dev/null 2>&1 && yum makecache >> /dev/null 2>&1
 
 # Install containerd
 echo -en "$GREEN_COL \tInstall containerd service ... $NORMAL_COL"
-yum install -y containerd.io-${CONTAINERD_VERSION} >/dev/null 2>&1
+if ! rpm -qa | grep -Eqi containerd.io-${CONTAINERD_VERSION}; then
+  yum install -y containerd.io-${CONTAINERD_VERSION} >/dev/null 2>&1
+fi
 systemctl restart containerd >/dev/null 2>&1
 systemctl enable containerd >/dev/null 2>&1
 echo -e "${YELLOW_COL} done ${NORMAL_COL}"
@@ -112,11 +116,12 @@ ctr run -d --net-host \
 
 # Check containerd status
 function health_check_config() {
+  mkdir -p ${LOG_PATH}
   mkdir -p ${HEALTH_CHECK_DIR}
   :>${HEALTH_CHECK_DIR}/offline-source-variable.conf
   cp -f offline-source-health-check.sh ${HEALTH_CHECK_DIR}
 
-  HEALTH_CHECK_VARIABLE_LIST="CABIN_NGINX_IMAGE PACKAGE_SOURCE_CONTAINERD_NAME COMMON_MIRROR_DIR PACKAGE_SOURCE_ROOT CHECK_URL PACKAGE_SOURCE_NGINX_LOG_FILE HEALTH_CHECK_DIR"
+  HEALTH_CHECK_VARIABLE_LIST="CABIN_NGINX_IMAGE PACKAGE_SOURCE_CONTAINERD_NAME COMMON_MIRROR_DIR PACKAGE_SOURCE_ROOT CHECK_URL PACKAGE_SOURCE_NGINX_LOG_FILE HEALTH_CHECK_DIR LOG_PATH"
 
   for i in ${HEALTH_CHECK_VARIABLE_LIST}; do
     eval value="$"${i}
@@ -124,7 +129,12 @@ function health_check_config() {
   done
 
   # set crontab
-  crontab -l > conf && echo "* * * * * bash ${HEALTH_CHECK_DIR}/offline-source-health-check.sh ${HEALTH_CHECK_DIR}" >> conf && crontab conf && rm -f conf
+  crontab -l > conf
+  crontab_config="* * * * * bash ${HEALTH_CHECK_DIR}/offline-source-health-check.sh ${HEALTH_CHECK_DIR} >> ${LOG_FILE}"
+  if ! cat conf | grep -Eqi "${crontab_config}"; then
+    echo "${crontab_config}" >> conf
+  fi
+  crontab conf && rm -f conf
 }
 
 ## Check package source package installation..

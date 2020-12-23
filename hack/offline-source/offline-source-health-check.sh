@@ -14,6 +14,26 @@ NORMAL_COL="\\033[0;39m"
 WORK_HOME=$1
 source ${WORK_HOME}/offline-source-variable.conf
 
+function print_log() {
+  log_type=$1
+  log_message=$2
+  case ${log_type} in
+    info )
+      echo -e "${GREEN_COL} `date +%y/%m/%d-%H:%M:%S` ${log_message} ${NORMAL_COL}"
+      ;;
+    warning )
+      echo -e "${YELLOW_COL} `date +%y/%m/%d-%H:%M:%S` ${log_message} ${NORMAL_COL}"
+      ;;
+    error )
+      echo -e "${RED_COL} `date +%y/%m/%d-%H:%M:%S` ${log_message} ${NORMAL_COL}"
+      ;;
+  esac
+}
+
+function log_clean() {
+  find ${LOG_PATH} -mtime +30 -name "health_check_file_.*.log" -exec rm -rf {} \;
+}
+
 function restart_offline_source() {
   # Ensure image exist
   if ! ctr i ls | grep -Eqi ${CABIN_NGINX_IMAGE}; then
@@ -35,18 +55,26 @@ function restart_offline_source() {
     --log-uri file://${PACKAGE_SOURCE_NGINX_LOG_FILE} \
     --mount type=bind,src=${COMMON_MIRROR_DIR},dst=/usr/share/nginx/html,options=rbind:r \
     ${CABIN_NGINX_IMAGE} ${PACKAGE_SOURCE_CONTAINERD_NAME}
+  return 0
 }
 
 function health_check() {
   health_check=`curl -I -o /dev/null -s -w %{http_code} ${CHECK_URL}` || true
   sleep 1
   if [ $health_check == 200 ];then
-    exit 0
+    print_log info "Offline source container is health"
   else
+    print_log info "Offline source container is unhealth, will start container"
     restart_offline_source
     sleep 3
     health_check
   fi
 }
 
-health_check
+print_log info "Start health check"
+
+if health_check; then
+  print_log info "Health check finish !"
+else
+  print_log error "Health check error, Please check !"
+fi
