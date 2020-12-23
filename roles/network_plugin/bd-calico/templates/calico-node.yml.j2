@@ -40,6 +40,13 @@ spec:
         - name: upgrade-ipam
           image: {{ calico_cni_image_repo }}:{{ calico_cni_image_tag }}
           command: ["/opt/cni/bin/calico-ipam", "-upgrade"]
+          resources:
+            limits:
+              cpu: {{ calico_node_cpu_limit }}
+              memory: {{ calico_node_memory_limit }}
+            requests:
+              cpu: {{ calico_node_cpu_requests }}
+              memory: {{ calico_node_memory_requests }}
           env:
             - name: KUBERNETES_NODE_NAME
               valueFrom:
@@ -63,6 +70,13 @@ spec:
         - name: install-cni
           image: {{ calico_cni_image_repo }}:{{ calico_cni_image_tag }}
           command: ["/opt/cni/bin/install"]
+          resources:
+            limits:
+              cpu: {{ calico_node_cpu_limit }}
+              memory: {{ calico_node_memory_limit }}
+            requests:
+              cpu: {{ calico_node_cpu_requests }}
+              memory: {{ calico_node_memory_requests }}
           env:
             # Name of the CNI config file to create.
             - name: CNI_CONF_NAME
