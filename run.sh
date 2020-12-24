@@ -40,8 +40,8 @@ function ssh_certs() {
 
 function check_log() {
   if [[ ${LOG_PATH} ]]; then
-    unreachable_count=$(cat ${${LOG_PATH}} | grep "unreachable" | grep "failed" | awk '{print $5}' | uniq | wc -l)
-    failed_count=$(cat ${${LOG_PATH}} | grep "unreachable" | grep "failed" | awk '{print $6}' | uniq | wc -l)
+    unreachable_count=$(cat ${LOG_PATH} | grep "unreachable" | grep "failed" | awk '{print $5}' | uniq | wc -l)
+    failed_count=$(cat ${LOG_PATH} | grep "unreachable" | grep "failed" | awk '{print $6}' | uniq | wc -l)
     if [[ ${unreachable_count} -eq 1 ]] && [[ ${failed_count} -eq 1 ]]; then
       # success
       echo -e "${GREEN_COL}#### result: success ####${NORMAL_COL}"
