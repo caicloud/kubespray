@@ -199,6 +199,17 @@
   when:
     - inventory_hostname == groups['kube-master'][0]
 
+- name: Calico | Set calico peers
+  set_fact:
+    peers: |-
+      {% for peer in calico_peers %}
+      {% set _ = peers.append({"router_id": peer, "as": "{{ global_as_num }}", "scope": "global" }) %}
+      {% endfor %}
+      {{ peers }}
+  when:
+    - calico_peers | default([]) | length != 0
+  run_once: yes
+
 - name: Calico | Configure peering with router(s) at global scope
   command:
     cmd: "{{ bin_dir }}/calicoctl.sh apply -f -"

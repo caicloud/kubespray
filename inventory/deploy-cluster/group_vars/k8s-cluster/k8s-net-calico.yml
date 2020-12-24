@@ -2,14 +2,26 @@
 
 # Set default calico network backend
 calico_backend: "vxlan"
-calico_peer_type: ""
+
+# Set bgp mode, inCluster or router
+calico_peer_type: "inCluster"
+
+# Set ToR IPs
+calico_peers: []
+
+# Set bgp router number
+as_num: "64512"
+
+# Enable fixedip ipam
+fixedip_enabled: false
+recycle_enabled: false
 
 ## With calico it is possible to distributed routes with border routers of the datacenter.
 ## Warning : enabling router peering will disable calico's default behavior ('node mesh').
 ## The subnets of each nodes will be distributed by the datacenter router
-peer_with_router: "{{ calico_backend == 'bird' and calico_peer_type == 'router' | default(false) | bool }}"
+peer_with_router: "{{ (calico_backend == 'bird' and calico_peer_type == 'router') | default(false) | bool }}"
 
-peer_with_calico_rr: "{{ calico_backend == 'bird' and calico_peer_type == 'inCluster' | default(false) | bool }}"
+peer_with_calico_rr: "{{ (calico_backend == 'bird' and calico_peer_type == 'inCluster') | default(false) | bool }}"
 
 # Enables Internet connectivity from containers
 # nat_outgoing: true
@@ -24,16 +36,9 @@ peer_with_calico_rr: "{{ calico_backend == 'bird' and calico_peer_type == 'inClu
 # calico_pool_cidr: 1.2.3.4/5
 
 # Global as_num (/calico/bgp/v1/global/as_num)
-global_as_num: "64512"
+global_as_num: "{{ as_num }}"
 
-peers: >-
-  {% if calico_peers is defined %}
-  {% for peer in calico_peers %}
-  - router_id: "{{ peer }}"
-    as: "{{ global_as_num }}"
-    scope: "global"
-  {% endfor %}
-  {% endif %}
+peers: []
 
 # You can set MTU value here. If left undefined or empty, it will
 # not be specified in calico CNI config, so Calico will use built-in

@@ -21,3 +21,14 @@ data:
   cloudProvider: "generic"
 {% endif %}
   gpuEnhancement: "{{ gpu_enhancement }}"
+  calicoBackend: "{{ calico_backend }}"
+{% if calico_backend == "bird" %}
+  calicoPeerType: "{{ calico_peer_type }}"
+{% if calico_peer_type == "router" %}
+  calicoPeers: "{{ calico_peers | join(', ') }}"
+{% endif %}
+{% endif %}
+  asNum: "{{ as_num }}"
+  fixedIPEnabled: "{{ fixedip_enabled | lower }}"
+  recycleEnabled: "{{ recycle_enabled | lower }}"
+  kubeNetworkNodePrefix: "{{ kube_network_node_prefix }}"
