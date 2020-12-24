@@ -151,3 +151,15 @@
 - name: Update certificate
   shell: update-ca-trust
   when: image_registry_ca_self_sign
+
+- name: Copy nouveau files
+  copy:
+    src: nvidia-nouveau.conf
+    dest: /etc/modprobe.d/blacklist-nouveau.conf
+  when:
+    - containeros_cluster == true
+
+- name: Regenerate the kernel initramfs
+  shell: dracut --force
+  when:
+    - containeros_cluster == true
