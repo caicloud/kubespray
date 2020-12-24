@@ -38,6 +38,20 @@ function ssh_certs() {
   sed -i "s#ansible_ssh_pass=[^ ]*#ansible_ssh_private_key_file=${SSH_CERT_PATH}/id_rsa#g" ${INVENTORY_PATH}/inventory
 }
 
+function check_log() {
+  if [[ ${LOG_PATH} ]]; then
+    unreachable_count=$(cat ${${LOG_PATH}} | grep "unreachable" | grep "failed" | awk '{print $5}' | uniq | wc -l)
+    failed_count=$(cat ${${LOG_PATH}} | grep "unreachable" | grep "failed" | awk '{print $6}' | uniq | wc -l)
+    if [[ ${unreachable_count} -eq 1 ]] && [[ ${failed_count} -eq 1 ]]; then
+      # success
+      echo -e "${GREEN_COL}#### result: success ####${NORMAL_COL}"
+    else
+      # failed
+      echo -e "${RED_COL}#### result: failed ####${NORMAL_COL}"
+    fi
+  fi
+}
+
 # Copy from config path
 rm -f ${INVENTORY_PATH}/env.yml ${INVENTORY_PATH}/inventory
 cp -f ${CONFIG_PATH}/env.yml ${INVENTORY_PATH}/env.yml
@@ -61,12 +75,14 @@ case $input in
     echo -e "${GREEN_COL}       ############ Start install cluster ################       ${NORMAL_COL}"
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       cluster.yml
+    check_log
     ;;
   remove )
     echo -e "${GREEN_COL}       ############ Start remove cluster #################       ${NORMAL_COL}"
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       -e reset_confirmation=yes --skip-tags='mounts' \
       reset.yml
+    check_log
     ;;
   add-node )
     NODE_NAME=$2
@@ -74,6 +90,7 @@ case $input in
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       --limit=${NODE_NAME} \
       scale.yml
+    check_log
     ;;
   remove-node )
     NODE_NAME=$2
@@ -85,6 +102,7 @@ case $input in
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       -e node=${NODE_NAME} -e delete_nodes_confirmation=yes ${EXTERNEL_CONFIG} \
       remove-node.yml
+    check_log
     ;;
   add-master )
     echo -e "${GREEN_COL}       ############ Start add master node ################       ${NORMAL_COL}"
@@ -92,6 +110,7 @@ case $input in
       cluster.yml
     # restart every node nginx service
     ansible -i ${INVENTORY_PATH}/inventory kube-node -m shell -a "crictl stop `crictl ps | grep nginx-proxy | awk '{print $1}'`"
+    check_log
     ;;
   remove-master )
     NODE_NAME=$2
@@ -101,6 +120,7 @@ case $input in
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       -e node=${NODE_NAME} -e delete_nodes_confirmation=yes ${EXTERNEL_CONFIG} \
       remove-node.yml
+    check_log
     ;;
   add-etcd )
     echo -e "${GREEN_COL}       ############ Start add etcd node ##################       ${NORMAL_COL}"
@@ -113,6 +133,8 @@ case $input in
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       --limit=etcd,kube-master -e ignore_assert_errors=yes -e etcd_retries=20 \
       upgrade-cluster.yml
+    
+    check_log
     ;;
   remove-etcd )
     NODE_NAME=$2
@@ -129,5 +151,7 @@ case $input in
 
     # update etcd config in cluster
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" cluster.yml
+
+    check_log
     ;;
 esac
