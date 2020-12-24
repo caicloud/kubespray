@@ -17,6 +17,13 @@ DEPLOY_HOME=/kubespray
 INVENTORY_PATH=${DEPLOY_HOME}/inventory/deploy-cluster
 CONFIG_PATH=${DEPLOY_HOME}/config
 SSH_CERT_PATH=${CONFIG_PATH}/ssh_cert
+CONTAINER_MOUNT_PATH=${DEPLOY_HOME}/container_config
+
+if [[ -f ${CONTAINER_MOUNT_PATH}/env.yml ]] && [[ -f ${CONTAINER_MOUNT_PATH}/inventory ]]; then
+  mkdir -p ${CONFIG_PATH}
+  cp -f ${CONTAINER_MOUNT_PATH}/env.yml ${CONFIG_PATH}/env.yml
+  cp -f ${CONTAINER_MOUNT_PATH}/inventory ${CONFIG_PATH}/inventory
+fi
 
 if ! [[ -d ${CONFIG_PATH} ]]; then
   echo -e "${RED_COL} Config path not exist, Please check ${NORMAL_COL}"
