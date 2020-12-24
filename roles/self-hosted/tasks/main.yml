@@ -150,10 +150,16 @@
 #   import_tasks: install_keepalived.yml
 #   when: not deploy_control_cluster
 
+- name: Generate kubeconfig file base64 code
+  shell: |
+    cat {{ local_kubeconfig_file }} | base64 | tr -d "\n"
+  delegate_to: localhost
+  register: local_kubeconfig_base64
+
 - name: Generate cluster crd
   template:
     src: "{{ item }}.j2"
-    dest: "{{ kube_config_dir }}/{{ item }}"
+    dest: "{{ local_config_path }}/{{ item }}"
   with_items:
     - cluster-crd-patch.yml
   run_once: true
@@ -163,7 +169,7 @@
 # TODO: Modify kube.py, support kubectl patch
 - name: Upgrade {{ cluster_identity_name }} cluster cr message
   shell: |
-    kubectl -n {{ cos_running_namespaces }} patch cluster {{ cluster_identity_name }} -p "$(cat {{ kube_config_dir }}/{{ item }})"
+    kubectl patch cluster {{ cluster_identity_name }} --type merge -p "$(cat {{ local_config_path }}/{{ item }})"
   with_items:
     - cluster-crd-patch.yml
   run_once: true
