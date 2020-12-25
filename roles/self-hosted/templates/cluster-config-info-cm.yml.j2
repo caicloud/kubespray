@@ -41,6 +41,8 @@ data:
 {% endif %}
     clusterSets:
       k8s_custom: false
+    kubeServiceAddresses: "{{ kube_service_addresses }}"
+    kubePodsSubnet: "{{ kube_pods_subnet }}"
   machine: |
 {% for hostname in ansible_play_hosts %}
     {{ hostname }}:
