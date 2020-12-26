@@ -16,7 +16,7 @@ data:
       "capabilities": {
         "portMappings": true
       },
-      "confDir": "/etc/cni/net.d/",
+      "confDir": "/etc/cni/multus/net.d/",
       "logFile": "/var/log/multus.log",
       "logLevel": "error",
       "clusterNetwork": "k8s-pod-network",
