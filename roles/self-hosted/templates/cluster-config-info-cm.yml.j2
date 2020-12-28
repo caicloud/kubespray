@@ -43,6 +43,21 @@ data:
       k8s_custom: false
     kubeServiceAddresses: "{{ kube_service_addresses }}"
     kubePodsSubnet: "{{ kube_pods_subnet }}"
+{% if enable_nodelocaldns %}
+{% set kubelet_cluster_dns = [nodelocaldns_ip] %}
+{% elif dns_mode in ['coredns'] %}
+{% set kubelet_cluster_dns = [skydns_server] %}
+{% elif dns_mode == 'coredns_dual' %}
+{% set kubelet_cluster_dns = [skydns_server,skydns_server_secondary] %}
+{% elif dns_mode == 'manual' %}
+{% set kubelet_cluster_dns = [manual_dns_server] %}
+{% else %}
+{% set kubelet_cluster_dns = [] %}
+{% endif %}
+  kubeletClusterDns: |
+{% for dns_address in kubelet_cluster_dns %}
+    - "{{ dns_address }}"
+{% endfor %}
   machine: |
 {% for hostname in ansible_play_hosts %}
     {{ hostname }}:
