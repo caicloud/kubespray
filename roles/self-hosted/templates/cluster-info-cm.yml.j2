@@ -45,7 +45,4 @@ data:
 {% else %}
 {% set kubelet_cluster_dns = [] %}
 {% endif %}
-  kubeletClusterDns: |
-{% for dns_address in kubelet_cluster_dns %}
-    - "{{ dns_address }}"
-{% endfor %}
+  kubeletClusterDns: "{{ kubelet_cluster_dns | join(', ') }}"
