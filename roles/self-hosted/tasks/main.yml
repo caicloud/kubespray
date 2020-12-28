@@ -155,10 +155,12 @@
   when:
     - inventory_hostname in groups['kube-master'][0]
 
-# # Create VIP
-# - name: Create VIP
-#   import_tasks: install_keepalived.yml
-#   when: not deploy_control_cluster
+# Create VIP
+- name: Create VIP
+  import_tasks: create-vip.yml
+  when:
+    - not deploy_control_cluster
+    - inventory_hostname in groups['kube-master'][0]
 
 - name: Generate kubeconfig file base64 code
   shell: |

@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: kube-keepalived-vip
+spec:
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      name: kube-keepalived-vip
+  template:
+    metadata:
+      labels:
+        name: kube-keepalived-vip
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: In
+                values:
+                - ""
+      hostNetwork: true
+      containers:
+        - image: test.cargo.io/release/kube-keepalived-vip:0.11
+          name: kube-keepalived-vip
+          imagePullPolicy: {{ k8s_image_pull_policy }}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /lib/modules
+              name: modules
+              readOnly: true
+            - mountPath: /dev
+              name: dev
+          # use downward API
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+          # to use unicast
+          args:
+          - --services-configmap=default/cluster-vip-configmap
+          # unicast uses the ip of the nodes instead of multicast
+          # this is useful if running in cloud providers (like AWS)
+          #- --use-unicast=true
+      volumes:
+        - name: modules
+          hostPath:
+            path: /lib/modules
+        - name: dev
+          hostPath:
+            path: /dev

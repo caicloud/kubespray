@@ -82,6 +82,10 @@ bridge_vlan_image_repo: "{{ release_image_repo }}/bridge-vlan"
 
 network_agent_image_repo: "{{ release_image_repo }}/network-agent"
 
+kube_keepalived_vip_enabled: "{% if deploy_control_cluster %}false{% else %}true{% endif %}"
+kube_keepalived_vip_repo: "{{ gcr_image_repo }}/kube-keepalived-vip"
+kube_keepalived_vip_tag: "0.11"
+
 # Release generate images list for auto pcakage
 kube_apiserver_image_repo: "{{ release_image_repo }}/kube-apiserver"
 kube_scheduler_image_repo: "{{ release_image_repo }}/kube-scheduler"
@@ -102,3 +106,4 @@ kube_proxy_image_name: "{{ kube_proxy_image_repo }}:{{ kube_version }}"
 kube_apiserver_image_name: "{{ kube_apiserver_image_repo }}:{{ kube_version }}"
 kube_scheduler_image_name: "{{ kube_scheduler_image_repo }}:{{ kube_version }}"
 kube_controller_manager_image_name: "{{ kube_controller_manager_image_repo }}:{{ kube_version }}"
+kube_keepalived_image_name: "{{ kube_keepalived_vip_repo }}:{{ kube_keepalived_vip_tag }}"
