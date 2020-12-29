@@ -8,13 +8,49 @@
   command: ip link del dummy0
   when: dummy0.stat.exists
 
+- name: reset | check vxlan.calico network device
+  stat:
+    path: /sys/class/net/vxlan.calico
+  register: vxlan_calico
+
+- name: reset | remove the vxlan network device created by calico
+  command: ip link del vxlan.calico
+  ignore_errors: True
+  when: vxlan_calico.stat.exists
+
+- name: reset | check tunl0 network device
+  stat:
+    path: /sys/class/net/tunl0
+  register: tunl0
+
+- name: reset | remove the tunl0 device created by calico
+  command: ip link del tunl0
+  ignore_errors: True
+  when: tunl0.stat.exists
+
+- name: reset | get remaining routes set by vxlan
+  command: ip route show dev vxlan.calico
+  changed_when: false
+  register: vxlan_routes
+  ignore_errors: True
+  when: calico_network_backend == "vxlan"
+
+- name: reset | remove remaining routes set by vxlan
+  command: "ip route del {{ vxlan_route }} dev vxlan.calico"
+  ignore_errors: True
+  with_items: "{{ vxlan_routes.stdout_lines }}"
+  loop_control:
+    loop_var: vxlan_route
+
 - name: reset | get remaining routes set by bird
   command: ip route show proto bird
   changed_when: false
+  ignore_errors: True
   register: bird_routes
 
 - name: reset | remove remaining routes set by bird  # noqa 301
   command: "ip route del {{ bird_route }} proto bird"
+  ignore_errors: True
   with_items: "{{ bird_routes.stdout_lines }}"
   loop_control:
     loop_var: bird_route
