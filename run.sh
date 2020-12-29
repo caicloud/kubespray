@@ -116,7 +116,7 @@ case $input in
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       cluster.yml
     # restart every node nginx service
-    ansible -i ${INVENTORY_PATH}/inventory kube-node -m shell -a "crictl stop `crictl ps | grep nginx-proxy | awk '{print $1}'`"
+    ansible -i ${INVENTORY_PATH}/inventory kube-node -m shell -a "crictl ps | grep nginx-proxy | awk '{print \$1}' | xargs -I {} crictl exec {} nginx -s reload"
     check_log
     ;;
   remove-master )
