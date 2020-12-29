@@ -35,14 +35,7 @@ data:
   kubeServiceAddresses: "{{ kube_service_addresses }}"
   kubePodsSubnet: "{{ kube_pods_subnet }}"
 {% if enable_nodelocaldns %}
-{% set kubelet_cluster_dns = [nodelocaldns_ip] %}
+  kubeletClusterDns: "{{ nodelocaldns_ip }}"
 {% elif dns_mode in ['coredns'] %}
-{% set kubelet_cluster_dns = [skydns_server] %}
-{% elif dns_mode == 'coredns_dual' %}
-{% set kubelet_cluster_dns = [skydns_server,skydns_server_secondary] %}
-{% elif dns_mode == 'manual' %}
-{% set kubelet_cluster_dns = [manual_dns_server] %}
-{% else %}
-{% set kubelet_cluster_dns = [] %}
+  kubeletClusterDns: "{{ skydns_server }}"
 {% endif %}
-  kubeletClusterDns: "{{ kubelet_cluster_dns | join(', ') }}"
