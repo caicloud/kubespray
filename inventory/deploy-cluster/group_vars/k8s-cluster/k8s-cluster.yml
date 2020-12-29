@@ -343,7 +343,8 @@ kube_apiserver_enable_admission_plugins:
   - EventRateLimit
 
 ### Set k8s component bind host address
-kube_apiserver_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
+# kube_apiserver_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
+kube_apiserver_bind_address: "0.0.0.0"
 kube_controller_manager_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
 kube_scheduler_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
 
