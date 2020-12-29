@@ -22,7 +22,7 @@ release_image_repo: "{{ image_registry_domain }}/{{ image_registry_project_relea
 # Image version
 kube_version: v1.19.3
 calico_version: "v3.17.0"
-multus_version: "v3.6"
+multus_version: "v3.6.2-rc.1"
 pod_infra_version: "3.2"
 nginx_image_tag: 1.19
 dnsautoscaler_version: 1.8.1
@@ -62,7 +62,7 @@ calico_policy_image_tag: "{{ calico_policy_version }}"
 pod_infra_image_repo: "{{ kube_image_repo }}/pause"
 pod_infra_image_tag: "{{ pod_infra_version }}"
 
-multus_image_repo: "{{ docker_image_repo }}/nfvpe-multus"
+multus_image_repo: "{{ release_image_repo }}/multus"
 multus_image_tag: "{{ multus_version }}"
 
 nginx_image_repo: "{{ docker_image_repo }}/library-nginx"
