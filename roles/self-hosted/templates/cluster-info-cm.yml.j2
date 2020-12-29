@@ -32,3 +32,10 @@ data:
   fixedIPEnabled: "{{ fixedip_enabled | lower }}"
   recycleEnabled: "{{ recycle_enabled | lower }}"
   kubeNetworkNodePrefix: "{{ kube_network_node_prefix }}"
+  kubeServiceAddresses: "{{ kube_service_addresses }}"
+  kubePodsSubnet: "{{ kube_pods_subnet }}"
+{% if enable_nodelocaldns %}
+  kubeletClusterDns: "{{ nodelocaldns_ip }}"
+{% elif dns_mode in ['coredns'] %}
+  kubeletClusterDns: "{{ skydns_server }}"
+{% endif %}
