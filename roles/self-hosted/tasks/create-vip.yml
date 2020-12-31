@@ -1,3 +1,7 @@
+- name: Create VIP | Gen network interface name
+  shell: ip a | grep {{ ip | default(fallback_ips[inventory_hostname]) }} | awk '{ print $NF }'
+  register: network_interface
+
 - name: Create VIP | Generate keepalived config
   template:
     src: "{{ item }}.j2"

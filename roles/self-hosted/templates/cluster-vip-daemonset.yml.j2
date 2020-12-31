@@ -1,7 +1,8 @@
 apiVersion: apps/v1
 kind: DaemonSet
 metadata:
-  name: kube-keepalived-vip
+  name: cluster-vip
+  namespace: {{ cos_running_namespaces }}
 spec:
   updateStrategy:
     rollingUpdate:
@@ -9,12 +10,13 @@ spec:
     type: RollingUpdate
   selector:
     matchLabels:
-      name: kube-keepalived-vip
+      name: cluster-vip
   template:
     metadata:
       labels:
-        name: kube-keepalived-vip
+        name: cluster-vip
     spec:
+      serviceAccountName: cluster-vip
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -26,18 +28,15 @@ spec:
                 - ""
       hostNetwork: true
       containers:
-        - image: test.cargo.io/release/kube-keepalived-vip:0.11
-          name: kube-keepalived-vip
+        - image: {{ kube_keepalived_vip_repo }}:{{ kube_keepalived_vip_tag }}
+          name: cluster-vip
           imagePullPolicy: {{ k8s_image_pull_policy }}
           securityContext:
             privileged: true
           volumeMounts:
-            - mountPath: /lib/modules
-              name: modules
+            - mountPath: /etc/keepalived
+              name: keepalived-config
               readOnly: true
-            - mountPath: /dev
-              name: dev
-          # use downward API
           env:
             - name: POD_NAME
               valueFrom:
@@ -47,16 +46,17 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-          # to use unicast
-          args:
-          - --services-configmap=default/cluster-vip-configmap
-          # unicast uses the ip of the nodes instead of multicast
-          # this is useful if running in cloud providers (like AWS)
-          #- --use-unicast=true
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command:
+          - /usr/sbin/keepalived
+          - -f
+          - /etc/keepalived/keepalived-$(NODE_NAME).conf
+          - --dont-fork
+          - --log-console
       volumes:
-        - name: modules
-          hostPath:
-            path: /lib/modules
-        - name: dev
-          hostPath:
-            path: /dev
+        - name: keepalived-config
+          configMap:
+            name: cluster-vip-configmap

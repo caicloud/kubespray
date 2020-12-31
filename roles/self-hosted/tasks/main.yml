@@ -160,7 +160,9 @@
   import_tasks: create-vip.yml
   when:
     - not deploy_control_cluster
+    - groups['kube-master'] | length > 1
     - inventory_hostname in groups['kube-master'][0]
+    - cluster_vip != ""
 
 - name: Generate kubeconfig file base64 code
   shell: |

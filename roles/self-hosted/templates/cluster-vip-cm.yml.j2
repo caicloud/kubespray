@@ -2,5 +2,36 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: cluster-vip-configmap
+  namespace: {{ cos_running_namespaces }}
 data:
-  {{ cluster_vip }}: default/kubernetes
+{% for host in groups['kube-master'] %}
+  keepalived-{{ hostvars[host]['ansible_hostname'] }}.conf: |
+    global_defs {
+      router_id cluster-vip
+    }
+
+    vrrp_instance VI_1 {
+{% if inventory_hostname in groups['kube-master'][0] %}
+      state MASTER
+      priority 150
+{% else %}
+      state BACKUP
+      priority 100
+{% endif %}
+      interface {{ network_interface.stdout_lines[0] }}
+      virtual_router_id 50
+      advert_int 1
+      unicast_peer {
+      {% for host in groups['kube-master'] -%}
+        {{ hostvars[host]['access_ip'] | default(hostvars[host]['ip'] | default(fallback_ips[host])) }}
+      {% endfor -%}        
+      }
+      authentication {
+        auth_type PASS
+        auth_pass {{ lookup('password', '/dev/null length=5 chars=ascii_letters') }}
+      }
+      virtual_ipaddress {
+        {{ cluster_vip }}
+      }
+    }
+{% endfor %}
