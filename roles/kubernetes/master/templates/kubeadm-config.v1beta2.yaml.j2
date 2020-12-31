@@ -276,6 +276,9 @@ apiServer:
   timeoutForControlPlane: 5m0s
 controllerManager:
   extraArgs:
+{% if authorization_always_allow_paths is defined %}
+    authorization-always-allow-paths: {{ authorization_always_allow_paths }}
+{% endif %}
     node-monitor-grace-period: {{ kube_controller_node_monitor_grace_period }}
     node-monitor-period: {{ kube_controller_node_monitor_period }}
     pod-eviction-timeout: {{ kube_controller_pod_eviction_timeout }}
@@ -327,6 +330,9 @@ controllerManager:
 {% endif %}
 scheduler:
   extraArgs:
+{% if authorization_always_allow_paths is defined %}
+    authorization-always-allow-paths: {{ authorization_always_allow_paths }}
+{% endif %}
     bind-address: {{ kube_scheduler_bind_address }}
 {% if kube_feature_gates %}
     feature-gates: {{ kube_feature_gates|join(',') }}
