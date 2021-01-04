@@ -74,3 +74,41 @@
     - { name: kernel.panic, value: 10 }
     - { name: kernel.panic_on_oops, value: 1 }
   when: kubelet_protect_kernel_defaults|bool
+
+- name: Set sysctl config in system
+  sysctl:
+    sysctl_file: /etc/sysctl.d/containeros.conf
+    name: "{{ item.name }}"
+    value: "{{ item.value }}"
+    state: present
+    reload: yes
+  with_items:
+    - { name: user.max_user_namespaces, value: 28633 }
+    - { name: vm.swappiness, value: 0 }
+    - { name: vm.dirty_writeback_centisecs, value: 100 }
+    - { name: vm.dirty_expire_centisecs, value: 200 }
+    - { name: vm.dirty_background_ratio, value: 0 }
+    - { name: vm.dirty_background_bytes , value:  209715200 }
+    - { name: vm.dirty_ratio, value: 40 }
+    - { name: vm.dirty_bytes , value:  0 }
+    - { name: vm.overcommit_memory, value: 1 }
+    - { name: vm.max_map_count, value: 262144 }
+    - { name: vm.panic_on_oom, value: 0 }
+    - { name: fs.file-max, value: 262144 }
+    - { name: fs.aio-max-nr, value: 1048576 }
+    - { name: fs.inotify.max_user_watches, value: 102400 }
+    - { name: fs.inotify.max_user_instances, value: 1024 }
+    - { name: kernel.core_uses_pid, value: 1 }
+    - { name: kernel.pid_max, value: 4194303 }
+    - { name: kernel.ctrl-alt-del, value: 1 }
+    - { name: kernel.msgmnb, value: 65536 }
+    - { name: kernel.msgmax, value: 65536 }
+    - { name: kernel.shmmni, value: 4096 }
+    - { name: kernel.shmmax, value: 8589934592 }
+    - { name: kernel.shmall, value: 8589934592 }
+    - { name: kernel.sem, value: 250 32000 100 128 }
+    - { name: kernel.panic, value: 10 }
+    - { name: kernel.panic_on_oops, value: 1 }
+    - { name: kernel.keys.root_maxkeys, value: 1000000 }
+    - { name: kernel.keys.root_maxbytes, value: 25000000 }
+  when: containeros_cluster|bool
