@@ -373,4 +373,4 @@ kubelet_config_extra_args: {
 }
 
 kube_proxy_metrics_bind_address: 0.0.0.0:10249
-authorization_always_allow_paths: [/healthz,/metrics]
+authorization_always_allow_paths: "/healthz,/metrics"
