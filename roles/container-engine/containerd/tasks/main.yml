@@ -130,3 +130,8 @@
     - not runc_stat.stat.exists
 
 - include_tasks: crictl.yml
+
+- name: Config containerd logrotate
+  include_tasks: containerd_logrotate.yml
+  when:
+    - ansible_os_family in ["CentOS","RedHat"]
