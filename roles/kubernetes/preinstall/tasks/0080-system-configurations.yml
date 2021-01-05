@@ -111,4 +111,17 @@
     - { name: kernel.panic_on_oops, value: 1 }
     - { name: kernel.keys.root_maxkeys, value: 1000000 }
     - { name: kernel.keys.root_maxbytes, value: 25000000 }
+    - { name: net.core.somaxconn, value: 65535 }
+    - { name: net.core.netdev_max_backlog, value: 65535 }
+    - { name: net.ipv4.tcp_fin_timeout, value: 30 }
+    - { name: net.ipv4.tcp_max_syn_backlog, value: 262144 }
+    - { name: net.ipv4.tcp_slow_start_after_idle, value: 0 }
+    - { name: net.ipv4.tcp_syn_retries, value: 3 }
+    - { name: net.ipv4.tcp_synack_retries, value: 3 }
+    - { name: net.ipv4.tcp_tw_reuse, value: 1 }
+    - { name: net.ipv4.conf.all.arp_filter, value: 1 }
+    - { name: net.ipv4.conf.default.arp_filter, value: 1 }
+    - { name: net.bridge.bridge-nf-call-iptables, value: 1 }
+    - { name: net.bridge.bridge-nf-call-arptables, value: 1 }
+    - { name: net.bridge.bridge-nf-call-ip6tables, value: 1 }
   when: containeros_cluster|bool
