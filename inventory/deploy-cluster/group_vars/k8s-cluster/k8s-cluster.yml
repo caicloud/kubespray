@@ -371,3 +371,6 @@ kubelet_config_extra_args: {
   evictionSoftGracePeriod: {"memory.available": "30s", "nodefs.available": "1m", "nodefs.inodesFree": "1m", "imagefs.available": "2m", "imagefs.inodesFree": "2m"},
   evictionPressureTransitionPeriod: 3s,
 }
+
+kube_proxy_metrics_bind_address: 0.0.0.0:10249
+authorization_always_allow_paths: "/healthz,/metrics"
