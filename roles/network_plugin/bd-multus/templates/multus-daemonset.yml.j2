@@ -46,7 +46,8 @@ spec:
       - command:
         - /bin/bash
         - -c
-        - install -m 744 /root/fixedip-ipam /host/opt/cni/bin/
+        - /root/fixedip-config.sh {{ fixedip_cni_client_config_file }}; install
+          -m 744 /root/fixedip-ipam {{ multus_cni_bin_dir }}/
         image: {{ fixedip_ipam_client_image_repo }}:{{ fixedip_ipam_client_image_tag }}
         name: init-kube-fixedip-ipam
         resources:
@@ -57,9 +58,12 @@ spec:
             cpu: 10m
             memory: 20Mi
         volumeMounts:
-        - mountPath: /host/opt/cni/bin
+        - mountPath: {{ multus_cni_bin_dir }}
           mountPropagation: HostToContainer
           name: cnibin
+        - mountPath: {{ multus_cni_etc_dir }}
+          mountPropagation: HostToContainer
+          name: cnietc
       containers:
       - name: kube-multus
         image: {{ multus_image_repo }}:{{ multus_image_tag }}
@@ -110,6 +114,9 @@ spec:
       - name: cnibin
         hostPath:
           path: {{ multus_cni_bin_dir_host }}
+      - name: cnietc
+        hostPath:
+          path: {{ multus_cni_etc_dir_host }}
       - name: multus-cfg
         configMap:
           defaultMode: 420
