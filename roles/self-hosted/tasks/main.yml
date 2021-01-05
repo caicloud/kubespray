@@ -187,3 +187,16 @@
   when:
     - not deploy_control_cluster
     - inventory_hostname in groups['kube-master'][0]
+
+- name: Create etcd tls secret
+  shell: |
+    kubectl -n {{ cos_running_namespaces }} delete secret etcd-tls-secrets || true && \
+    kubectl -n {{ cos_running_namespaces }} create secret generic etcd-tls-secrets \
+      --from-file=main-etcd-ca.pem={{ etcd_cert_dir }}/ca.pem \
+      --from-file=main-etcd-client.crt={{ etcd_cert_dir }}/admin-{{ inventory_hostname }}.pem \
+      --from-file=main-etcd-client.key={{ etcd_cert_dir }}/admin-{{ inventory_hostname }}-key.pem \
+      --from-file=event-etcd-ca.pem={{ etcd_cert_dir }}/ca.pem \
+      --from-file=event-etcd-client.crt={{ etcd_cert_dir }}/admin-{{ inventory_hostname }}.pem \
+      --from-file=event-etcd-client.key={{ etcd_cert_dir }}/admin-{{ inventory_hostname }}-key.pem
+  when:
+    - inventory_hostname in groups['kube-master'][0]
