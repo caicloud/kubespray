@@ -215,6 +215,7 @@
     - filter
     - nat
     - mangle
+    - raw
   when: flush_iptables|bool
   tags:
     - iptables
