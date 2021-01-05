@@ -62,7 +62,7 @@ calico_policy_image_tag: "{{ calico_policy_version }}"
 pod_infra_image_repo: "{{ kube_image_repo }}/pause"
 pod_infra_image_tag: "{{ pod_infra_version }}"
 
-multus_image_repo: "{{ release_image_repo }}/multus"
+multus_image_repo: "{{ release_image_repo }}/multus-cni"
 multus_image_tag: "{{ multus_version }}"
 
 nginx_image_repo: "{{ docker_image_repo }}/library-nginx"
