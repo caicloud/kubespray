@@ -41,6 +41,9 @@
   with_items: "{{ vxlan_routes.stdout_lines }}"
   loop_control:
     loop_var: vxlan_route
+  when:
+    - calico_network_backend == "vxlan"
+    - vxlan_routes.stdout_lines | length > 0
 
 - name: reset | get remaining routes set by bird
   command: ip route show proto bird
