@@ -40,13 +40,13 @@ data:
     isHighAvailable: false
 {% endif %}
     clusterSets:
-      k8s_custom: false
+      gpu_enhancement: "{{ gpu_enhancement }}"
     kubeServiceAddresses: "{{ kube_service_addresses }}"
     kubePodsSubnet: "{{ kube_pods_subnet }}"
 {% if enable_nodelocaldns %}
-  kubeletClusterDns: "{{ nodelocaldns_ip }}"
+    kubeletClusterDns: "{{ nodelocaldns_ip }}"
 {% elif dns_mode in ['coredns'] %}
-  kubeletClusterDns: "{{ skydns_server }}"
+    kubeletClusterDns: "{{ skydns_server }}"
 {% endif %}
   machine: |
 {% for hostname in ansible_play_hosts %}
