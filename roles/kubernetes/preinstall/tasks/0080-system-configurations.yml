@@ -121,7 +121,4 @@
     - { name: net.ipv4.tcp_tw_reuse, value: 1 }
     - { name: net.ipv4.conf.all.arp_filter, value: 1 }
     - { name: net.ipv4.conf.default.arp_filter, value: 1 }
-    - { name: net.bridge.bridge-nf-call-iptables, value: 1 }
-    - { name: net.bridge.bridge-nf-call-arptables, value: 1 }
-    - { name: net.bridge.bridge-nf-call-ip6tables, value: 1 }
   when: containeros_cluster|bool
