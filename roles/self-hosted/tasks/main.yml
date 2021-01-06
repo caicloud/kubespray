@@ -88,22 +88,26 @@
 - name: Fetch kubeconfig from master
   fetch:
     src: "/root/.kube/config"
-    dest: "{{ local_kubeconfig_file }}"
+    dest: "{{ item }}"
     flat: true
     validate_checksum: no
+  with_items:
+    - "{{ local_kubeconfig_file }}"
+    - "{{ local_vip_kubeconfig_file }}"
   when:
     - inventory_hostname in groups['kube-master'][0]
 
 - name: Modify kubeconfig when cluster_vip is defined
   shell: |
-    sed -i "s#{{ hostvars[groups['bastion'][0]]['ansible_host'] }}#{{ cluster_vip }}#g" {{ local_kubeconfig_file }}
+    sed -i "s#{{ hostvars[groups['bastion'][0]]['ansible_host'] }}#{{ cluster_vip }}#g" {{ local_vip_kubeconfig_file }}
+  delegate_to: localhost
   when:
     - cluster_vip is defined
     - inventory_hostname in groups['kube-master'][0]
 
 - name: Read kubeconfig file
   include_vars:
-    file: "{{ local_kubeconfig_file }}"
+    file: "{{ local_vip_kubeconfig_file }}"
   register: kubeConfigFile
   when:
     - inventory_hostname in groups['kube-master'][0]
@@ -173,7 +177,7 @@
 
 - name: Generate kubeconfig file base64 code
   shell: |
-    cat {{ local_kubeconfig_file }} | base64 | tr -d "\n"
+    cat {{ local_vip_kubeconfig_file }} | base64 | tr -d "\n"
   delegate_to: localhost
   register: local_kubeconfig_base64
 
