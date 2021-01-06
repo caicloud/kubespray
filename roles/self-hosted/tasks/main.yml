@@ -94,6 +94,13 @@
   when:
     - inventory_hostname in groups['kube-master'][0]
 
+- name: Modify kubeconfig when cluster_vip is defined
+  shell: |
+    sed -i "s#{{ hostvars[groups['bastion'][0]]['ansible_host'] }}#{{ cluster_vip }}#g" {{ local_kubeconfig_file }}
+  when:
+    - cluster_vip is defined
+    - inventory_hostname in groups['kube-master'][0]
+
 - name: Read kubeconfig file
   include_vars:
     file: "{{ local_kubeconfig_file }}"
