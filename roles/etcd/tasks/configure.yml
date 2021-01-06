@@ -40,12 +40,30 @@
 - include_tasks: refresh_config.yml
   when: is_etcd_master
 
+- name: Configure | Copy etcd logrotate file
+  template:
+    src: "etcd-host-logrotate.j2"
+    dest: /etc/logrotate.d/etcd
+    backup: yes
+  when:
+    - is_etcd_master and etcd_cluster_setup
+    - etcd_deployment_type == "host"
+
 - name: Configure | Copy etcd.service systemd file
   template:
     src: "etcd-{{ etcd_deployment_type }}.service.j2"
     dest: /etc/systemd/system/etcd.service
     backup: yes
   when: is_etcd_master and etcd_cluster_setup
+
+- name: Configure | Copy etcd-events.service systemd file
+  template:
+    src: "etcd-events-host-logrotate.j2"
+    dest: /etc/logrotate.d/etcd-events
+    backup: yes
+  when:
+    - is_etcd_master and etcd_events_cluster_setup
+    - etcd_deployment_type == "host"
 
 - name: Configure | Copy etcd-events.service systemd file
   template:

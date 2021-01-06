@@ -11,7 +11,7 @@ Wants={{ container_manager }}.service
 [Service]
 User=root
 EnvironmentFile=-{{ kube_config_dir }}/kubelet.env
-ExecStart={{ bin_dir }}/kubelet \
+ExecStart=/bin/sh -c  "exec {{ bin_dir }}/kubelet \
 		$KUBE_LOGTOSTDERR \
 		$KUBE_LOG_LEVEL \
 		$KUBELET_API_SERVER \
@@ -22,7 +22,8 @@ ExecStart={{ bin_dir }}/kubelet \
 		$DOCKER_SOCKET \
 		$KUBELET_NETWORK_PLUGIN \
 		$KUBELET_VOLUME_PLUGIN \
-		$KUBELET_CLOUDPROVIDER
+		$KUBELET_CLOUDPROVIDER \
+		>> /var/log/kubelet.log 2>&1"
 Restart=always
 RestartSec=10s
 

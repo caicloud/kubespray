@@ -1,0 +1,14 @@
+- name: Generate logrotate config
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    owner: root
+    group: root
+    mode: 0o644
+  notify: restart containerd
+  with_items:
+    - src: "containerd-logrotate.j2"
+      dest: "/etc/logrotate.d/containerd"
+    - src: "containerd-service.j2"
+      dest: "/usr/lib/systemd/system/containerd.service"
+

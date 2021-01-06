@@ -1,0 +1,12 @@
+/var/log/kubelet.log {
+    daily
+    missingok
+    rotate {{ rotate_count | int }}
+    compress
+    delaycompress
+    nomail
+    notifempty
+    create 0640 root root
+    copytruncate
+    maxsize {{ rotate_max_size }}
+}
