@@ -1,0 +1,13 @@
+spec:
+  containers:
+  - resources:
+      requests:
+        cpu: {{ kube_controller_manager_cpu_requests }}
+{% if kube_controller_manager_memory_requests %}
+        memory: {{ kube_controller_manager_memory_requests }}
+{% endif %}
+{% if kube_controller_manager_cpu_limits and kube_controller_manager_memory_limits %}
+      limits:
+        cpu: {{ kube_controller_manager_cpu_limits }}
+        memory: {{ kube_controller_manager_memory_limits }}
+{% endif %}

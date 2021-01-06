@@ -30,6 +30,7 @@ coredns_version: "1.6.7"
 fixedip_ipam_version: "v1.5.0-rc.1"
 bridge_vlan_image_tag: "v1.5.0-rc.1"
 network_agent_image_tag: "v1.5.0-rc.1"
+yq_version: "v4.2.1"
 
 ## Download config
 image_arch: "{{host_architecture | default('amd64')}}"
@@ -46,6 +47,7 @@ cni_download_url: "{{ download_url }}/files/cni-plugins-linux-{{ image_arch }}-v
 calico_ctl_version: "{{ calico_version }}"
 calicoctl_download_url: "{{ download_url }}/files/calicoctl-linux-{{ image_arch }}-{{ calico_ctl_version }}"
 crictl_download_url: "{{ download_url }}/files/crictl-v1.19.0-linux-{{ image_arch }}.tar.gz"
+yq_download_url: "{{ download_url }}/files/yq-linux-{{ image_arch }}-{{ yq_version }}"
 
 # Container image
 kube_proxy_image_repo: "{{ kube_image_repo }}/kube-proxy"

@@ -191,3 +191,8 @@ secrets_encryption_query: "resources[*].providers[0].{{kube_encryption_algorithm
 event_ttl_duration: "1h0m0s"
 
 kube_feature_gates: ["RotateKubeletServerCertificate=true"]
+
+## kubernetes static pod resource config
+kube_apiserver_cpu_requests: "250m"
+kube_controller_manager_cpu_requests: "200m"
+kube_scheduler_cpu_requests: "100m"
