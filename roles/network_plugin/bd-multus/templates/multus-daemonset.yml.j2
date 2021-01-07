@@ -29,7 +29,7 @@ spec:
       - command:
         - /bin/bash
         - -c
-        - install -m 744 /root/bridge-vlan /host/opt/cni/bin/
+        - install -m 744 /root/bridge-vlan {{ multus_cni_bin_dir }}
         image: {{ bridge_vlan_image_repo }}:{{ bridge_vlan_image_tag }}
         name: init-kube-bridge-vlan
         resources:
@@ -40,13 +40,13 @@ spec:
             cpu: 10m
             memory: 20Mi
         volumeMounts:
-        - mountPath: /host/opt/cni/bin
+        - mountPath: {{ multus_cni_bin_dir }}
           mountPropagation: HostToContainer
           name: cnibin
       - command:
         - /bin/bash
         - -c
-        - install -m 744 /root/fixedip-ipam /host/opt/cni/bin/
+        - /root/install-ipam.sh {{ multus_cni_bin_dir }}
         image: {{ fixedip_ipam_client_image_repo }}:{{ fixedip_ipam_client_image_tag }}
         name: init-kube-fixedip-ipam
         resources:
@@ -57,7 +57,7 @@ spec:
             cpu: 10m
             memory: 20Mi
         volumeMounts:
-        - mountPath: /host/opt/cni/bin
+        - mountPath: {{ multus_cni_bin_dir }}
           mountPropagation: HostToContainer
           name: cnibin
       containers:
