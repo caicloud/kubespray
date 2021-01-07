@@ -28,7 +28,7 @@ spec:
                 - ""
       hostNetwork: true
       containers:
-        - image: {{ kube_keepalived_vip_repo }}:{{ kube_keepalived_vip_tag }}
+        - image: {{ keepalived_vip_repo }}:{{ keepalived_vip_tag }}
           name: cluster-vip
           imagePullPolicy: {{ k8s_image_pull_policy }}
           securityContext:

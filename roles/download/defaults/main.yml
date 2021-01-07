@@ -580,10 +580,6 @@ dashboard_image_tag: "v2.0.4"
 dashboard_metrics_scraper_repo: "{{ docker_image_repo }}/kubernetesui/metrics-scraper"
 dashboard_metrics_scraper_tag: "v1.0.5"
 
-kube_keepalived_vip_enabled: "{% if deploy_control_cluster %}false{% else %}true{% endif %}"
-kube_keepalived_vip_repo: "{{ gcr_image_repo }}/google_containers/kube-keepalived-vip"
-kube_keepalived_vip_tag: "0.11"
-
 image_pull_command: "{{ docker_bin_dir }}/docker pull"
 image_save_command: "{{ docker_bin_dir }}/docker save {{ image_reponame }} | gzip -{{ download_compress }} > {{ image_path_final }}"
 image_load_command: "{{ docker_bin_dir }}/docker load < {{ image_path_final }}"
@@ -1175,12 +1171,12 @@ downloads:
     groups:
     - kube-master
   
-  kube_keepalived_vip_plugin:
-    enable: "{{ kube_keepalived_vip_enabled }}"
+  keepalived_vip_plugin:
+    enable: "{{ keepalived_vip_enabled }}"
     container: true
-    repo: "{{ kube_keepalived_vip_repo }}"
-    tag: "{{ kube_keepalived_vip_tag }}"
-    sha256: "{{ kube_keepalived_vip_checksum|default(None) }}"
+    repo: "{{ keepalived_vip_repo }}"
+    tag: "{{ keepalived_vip_tag }}"
+    sha256: "{{ keepalived_vip_checksum|default(None) }}"
     groups:
     - kube-master
 
