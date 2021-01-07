@@ -98,9 +98,11 @@ keepalived-push: keepalived-image
 	@docker push $(REGISTRY)/keepalived:$(KEEPALIVED_VERSION)
 
 save: release-image
+	@echo "[info] start save to file path: $(SAVE_PATH) ..."
 	@docker tag $(REGISTRY)/$(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):$(VERSION)
 	@docker save -o $(SAVE_PATH)/$(IMAGE_NAME)-$(VERSION).tar $(IMAGE_NAME):$(VERSION)
-	@gzip -f $(SAVE_PATH)/$(IMAGE_NAME)-$(VERSION).tar $(IMAGE_NAME):$(VERSION)
+	@gzip -f $(SAVE_PATH)/$(IMAGE_NAME)-$(VERSION).tar
+	@echo "[info] save image finish"
 
 lint:
 	@bash hack/lint/lint.sh
