@@ -43,6 +43,7 @@ DOWNLOAD_YAML_FILE         ?= ./inventory/deploy-cluster/group_vars/all/download
 SAVE_PATH                  ?= /tmp
 BASE_IMAGE_VERSION         ?= 18.04-kubespray-v0.1.0
 KUBESPRAY_BASE_IMAGE       ?= $(BASE_REGISTRY)/ubuntu:$(BASE_IMAGE_VERSION)
+KEEPALIVED_VERSION         ?= v0.1.0
 
 #
 # These variables should not need tweaking.
@@ -83,10 +84,20 @@ base-image:
 	@docker build --no-cache -t $(KUBESPRAY_BASE_IMAGE) \
 	--label $(DOCKER_LABELS) -f build/kubespray-base-image/Dockerfile .
 
+keepalived-image:
+	@docker build --no-cache -t $(REGISTRY)/keepalived:$(KEEPALIVED_VERSION) \
+	-f build/keepalived/Dockerfile .
+
 push: release-image
 	@docker push $(REGISTRY)/$(IMAGE_NAME):$(VERSION);
 
-save:
+base-push: base-image
+	@docker push $(KUBESPRAY_BASE_IMAGE)
+
+keepalived-push: keepalived-image
+	@docker push $(REGISTRY)/keepalived:$(KEEPALIVED_VERSION)
+
+save: release-image
 	@docker tag $(REGISTRY)/$(IMAGE_NAME):$(VERSION) $(IMAGE_NAME):$(VERSION)
 	@docker save -o $(SAVE_PATH)/$(IMAGE_NAME)-$(VERSION).tar $(IMAGE_NAME):$(VERSION)
 	@gzip -f $(SAVE_PATH)/$(IMAGE_NAME)-$(VERSION).tar $(IMAGE_NAME):$(VERSION)

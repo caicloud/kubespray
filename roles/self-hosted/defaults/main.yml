@@ -20,7 +20,8 @@ cos_running_namespaces: "cos-system"
 # if cluster-deploy-job is running in cluster as a job, this dir is read only.
 local_config_path: "/kubespray/config"
 
-local_kubeconfig_file: "{{ local_config_path }}/kubectl.kubeconfig"
+local_kubeconfig_file: "{{ local_config_path }}/kubectl.kubeconfig.local"
+local_vip_kubeconfig_file: "{{ local_config_path }}/kubectl.kubeconfig"
 
 cluster_vip: ""
 

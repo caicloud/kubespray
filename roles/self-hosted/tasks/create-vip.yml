@@ -1,0 +1,28 @@
+- name: Create VIP | Gen network interface name
+  shell: ip a | grep {{ ip | default(fallback_ips[inventory_hostname]) }} | awk '{ print $NF }'
+  register: network_interface
+
+- name: Create VIP | Generate keepalived config
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ self_hosted_config_dir }}/{{ item }}"
+  with_items:
+    - cluster-vip-rbac.yml
+    - cluster-vip-cm.yml
+    - cluster-vip-daemonset.yml
+
+- name: Create VIP | Create keepalived component
+  shell: |
+    kubectl apply -f {{ self_hosted_config_dir }}/{{ item }}
+  with_items:
+    - cluster-vip-rbac.yml
+    - cluster-vip-cm.yml
+    - cluster-vip-daemonset.yml
+
+- name: Create VIP | Check VIP is running
+  shell: |
+    ping -c 5 {{ cluster_vip }}
+  register: vip_test
+  until: vip_test.rc == 0
+  retries: 20
+  delay: 5

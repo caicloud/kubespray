@@ -1,0 +1,62 @@
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: cluster-vip
+  namespace: {{ cos_running_namespaces }}
+spec:
+  updateStrategy:
+    rollingUpdate:
+      maxUnavailable: 1
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      name: cluster-vip
+  template:
+    metadata:
+      labels:
+        name: cluster-vip
+    spec:
+      serviceAccountName: cluster-vip
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: In
+                values:
+                - ""
+      hostNetwork: true
+      containers:
+        - image: {{ keepalived_vip_repo }}:{{ keepalived_vip_tag }}
+          name: cluster-vip
+          imagePullPolicy: {{ k8s_image_pull_policy }}
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - mountPath: /etc/keepalived
+              name: keepalived-config
+              readOnly: true
+          env:
+            - name: POD_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
+            - name: POD_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: NODE_NAME
+              valueFrom:
+                fieldRef:
+                  fieldPath: spec.nodeName
+          command:
+          - /usr/sbin/keepalived
+          - -f
+          - /etc/keepalived/keepalived-$(NODE_NAME).conf
+          - --dont-fork
+          - --log-console
+      volumes:
+        - name: keepalived-config
+          configMap:
+            name: cluster-vip-configmap

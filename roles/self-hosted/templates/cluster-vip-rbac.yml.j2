@@ -1,0 +1,45 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: cluster-vip
+rules:
+- apiGroups: [""]
+  resources:
+  - pods
+  - nodes
+  - endpoints
+  - services
+  - configmaps
+  verbs: ["get", "list", "watch"]
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: cluster-vip
+  namespace: {{ cos_running_namespaces }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: cluster-vip
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-vip
+subjects:
+- kind: ServiceAccount
+  name: cluster-vip
+  namespace: {{ cos_running_namespaces }}
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata: 
+  name: cluster-vip-psp
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: psp:privileged
+subjects:
+- kind: ServiceAccount
+  name: cluster-vip
+  namespace: {{ cos_running_namespaces }}

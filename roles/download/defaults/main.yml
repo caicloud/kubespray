@@ -1170,6 +1170,15 @@ downloads:
     sha256: "{{ dashboard_digest_checksum|default(None) }}"
     groups:
     - kube-master
+  
+  keepalived_vip_plugin:
+    enable: "{{ keepalived_vip_enabled }}"
+    container: true
+    repo: "{{ keepalived_vip_repo }}"
+    tag: "{{ keepalived_vip_tag }}"
+    sha256: "{{ keepalived_vip_checksum|default(None) }}"
+    groups:
+    - kube-master
 
 download_defaults:
   container: false

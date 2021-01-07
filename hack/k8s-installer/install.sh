@@ -121,7 +121,7 @@ case $input in
     COMMAND="bash run.sh install"
     cluster_deploy "${COMMAND}"
     # Copy kubeconfig
-    cp ${CONFIG_DIR}/kubectl.kubeconfig ../.kubectl.kubeconfig
+    cp ${CONFIG_DIR}/kubectl.kubeconfig.local ../.kubectl.kubeconfig
     ;;
   remove )
     echo -e "$GREEN_COL remove kubernetes cluster and all platform data $NORMAL_COL"
