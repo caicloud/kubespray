@@ -1,0 +1,13 @@
+spec:
+  containers:
+  - resources:
+      requests:
+        cpu: {{ kube_scheduler_cpu_requests }}
+{% if kube_scheduler_memory_requests %}
+        memory: {{ kube_scheduler_memory_requests }}
+{% endif %}
+{% if kube_scheduler_cpu_limits and kube_scheduler_memory_limits %}
+      limits:
+        cpu: {{ kube_scheduler_cpu_limits }}
+        memory: {{ kube_scheduler_memory_limits }}
+{% endif %}

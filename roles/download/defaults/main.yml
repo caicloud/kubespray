@@ -1180,6 +1180,19 @@ downloads:
     groups:
     - kube-master
 
+  yq:
+    enabled: true
+    file: true
+    version: "{{ yq_version }}"
+    dest: "{{ local_release_dir }}/yq"
+    sha256: "{{ yq_download_checksum|default(None) }}"
+    url: "{{ yq_download_url }}"
+    unarchive: false
+    owner: "root"
+    mode: "0755"
+    groups:
+    - kube-master
+
 download_defaults:
   container: false
   file: false

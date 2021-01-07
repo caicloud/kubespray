@@ -22,6 +22,11 @@ spec:
       requests:
         cpu: {{ loadbalancer_apiserver_cpu_requests }}
         memory: {{ loadbalancer_apiserver_memory_requests }}
+{% if loadbalancer_apiserver_cpu_limits and loadbalancer_apiserver_memory_limits %}
+      limits:
+        cpu: {{ loadbalancer_apiserver_cpu_limits }}
+        memory: {{ loadbalancer_apiserver_memory_limits }}
+{% endif %}
     securityContext:
       privileged: true
     {% if loadbalancer_apiserver_healthcheck_port is defined -%}

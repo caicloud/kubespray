@@ -91,3 +91,6 @@
 
 - name: Include kubeadm secondary server apiserver fixes
   include_tasks: kubeadm-fix-apiserver.yml
+
+- name: Include resources config
+  include_tasks: resources-config.yml

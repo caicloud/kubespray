@@ -1,0 +1,52 @@
+- name: Create temporary directory
+  tempfile:
+    state: directory
+  register: resources_temp_dir
+
+- name: generate resources.yaml
+  template:
+    src: "resources/{{ item }}.j2"
+    dest: "{{ resources_temp_dir.path }}/{{ item }}"
+    owner: "root"
+    group: "root"
+  with_items:
+    - kube-apiserver-resources.yaml
+    - kube-controller-manager-resources.yaml
+    - kube-scheduler-resources.yaml
+
+- name: Modify static pod config
+  shell:
+    "{{ local_release_dir }}/yq eval-all 'select(fileIndex == 0) * select(filename == \"{{ resources_temp_dir.path }}/{{ item.resources_file }}\")' /etc/kubernetes/manifests/{{ item.static_pod_file }} {{ resources_temp_dir.path }}/{{ item.resources_file }} > {{ resources_temp_dir.path }}/{{ item.static_pod_file }}" 
+  with_items:
+    - static_pod_file: kube-apiserver.yaml
+      resources_file: kube-apiserver-resources.yaml
+    - static_pod_file: kube-controller-manager.yaml
+      resources_file: kube-controller-manager-resources.yaml
+    - static_pod_file: kube-scheduler.yaml
+      resources_file: kube-scheduler-resources.yaml
+
+- name: Copy component file
+  shell: |
+    \cp {{ resources_temp_dir.path }}/{{ item }} /etc/kubernetes/manifests/{{ item }} && \
+    chown root:root /etc/kubernetes/manifests/{{ item }} && \
+    chmod 600 /etc/kubernetes/manifests/{{ item }}
+  copy:
+    src: "{{ resources_temp_dir.path }}/{{ item }}"
+    dest: "/etc/kubernetes/manifests/{{ item }}"
+    owner: "root"
+    group: "root"
+    mode: "0600"
+    force: yes
+  with_items:
+    - kube-apiserver.yaml
+    - kube-controller-manager.yaml
+    - kube-scheduler.yaml
+  notify:
+    - "Master | Restart kube-controller-manager"
+    - "Master | Restart kube-scheduler"
+    - "Master | Restart apiserver"
+
+- name: Cleanup temporary directory
+  file:
+    path: "{{ resources_temp_dir.path }}"
+    state: absent

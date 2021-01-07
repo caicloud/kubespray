@@ -379,3 +379,24 @@ authorization_always_allow_paths: "/healthz,/metrics"
 # systemd service logrotate config
 rotate_count: 30
 rotate_max_size: 100M
+
+## kubernetes static pod resource config
+kube_apiserver_cpu_requests: "250m"
+kube_apiserver_memory_requests: "1Gi"
+kube_apiserver_cpu_limits: "1"
+kube_apiserver_memory_limits: "4Gi"
+
+kube_controller_manager_cpu_requests: "250m"
+kube_controller_manager_memory_requests: "125Mi"
+kube_controller_manager_cpu_limits: "1"
+kube_controller_manager_memory_limits: "500Mi"
+
+kube_scheduler_cpu_requests: "125m"
+kube_scheduler_memory_requests: "70Mi"
+kube_scheduler_cpu_limits: "500m"
+kube_scheduler_memory_limits: "250Mi"
+
+loadbalancer_apiserver_cpu_requests: "25m"
+loadbalancer_apiserver_memory_requests: "32Mi"
+loadbalancer_apiserver_cpu_limits: "50m"
+loadbalancer_apiserver_memory_limits: "100Mi"
