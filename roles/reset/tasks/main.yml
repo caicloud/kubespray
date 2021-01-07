@@ -220,6 +220,14 @@
   tags:
     - iptables
 
+- name: Clean all network-agent rules
+  shell: "iptables-save -t {{ item }} | grep -- '--comment .network-agent' | sed 's/^-A/-D/' | xargs -r -L 1 iptables -t {{ item }}"
+  with_items:
+    - nat
+    - mangle
+    - filter
+  ignore_errors: True
+
 - name: Clear IPVS virtual server table
   command: "ipvsadm -C"
   when:
