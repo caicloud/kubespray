@@ -93,8 +93,8 @@ function load_deploy_image() {
 }
 
 function push_deploy_image() {
-  IMAGE_NAME=`echo ${IMAGE_FALL_NAME} | awk -F '/cluster-deploy/' '{print $NF}'`
-  ctr i tag ${IMAGE_FALL_NAME} ${CARGO_CFG_DOMAIN}/cluster-deploy/${IMAGE_NAME} || true
+  IMAGE_NAME=`echo ${IMAGE_FALL_NAME} | awk -F '/release/' '{print $NF}'`
+  ctr i tag ${IMAGE_FALL_NAME} ${CARGO_CFG_DOMAIN}/release/${IMAGE_NAME} || true
   ctr i push -u ${REGISTRY_AUTH_USERNAME}:${REGISTRY_AUTH_PASSWORD} ${CARGO_CFG_DOMAIN}/release/${IMAGE_NAME}
 }
 
