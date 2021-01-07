@@ -33,11 +33,9 @@ spec:
                   app: fixedip-ipam-server
               topologyKey: kubernetes.io/hostname
       containers:
-        - env:
-            - name: IPAM_LISTEN_PORT
-              value: "{{ fixedip_ipam_server_port }}"
-            - name: IPAM_WEBHOOK_LISTEN_PORT
-              value: "{{ fixedip_ipam_webhook_port }}"
+        - args:
+            - --port={{ fixedip_ipam_server_port }}
+            - --webhook-port={{ fixedip_ipam_webhook_port }}
           image: {{ fixedip_ipam_server_image_repo }}:{{ fixedip_ipam_server_image_tag }}
           livenessProbe:
             failureThreshold: 3
@@ -100,36 +98,3 @@ spec:
       port: 8443
       protocol: TCP
       targetPort: {{ fixedip_ipam_webhook_port }}
----
-apiVersion: admissionregistration.k8s.io/v1
-kind: ValidatingWebhookConfiguration
-metadata:
-  name: ipresource-validating-webhook
-webhooks:
-- admissionReviewVersions:
-  - v1
-  - v1beta1
-  clientConfig:
-    caBundle:
-    service:
-      name: fixedip-ipam-server
-      namespace: kube-system
-      path: /ipresource-webhook
-      port: 8443
-  failurePolicy: Fail
-  matchPolicy: Equivalent
-  name: ipresource.networking.containeros.dev
-  rules:
-  - apiGroups:
-    - networking.containeros.dev
-    apiVersions:
-    - v1beta1
-    operations:
-    - CREATE
-    - UPDATE
-    - DELETE
-    resources:
-    - ipresources
-    scope: Namespaced
-  sideEffects: None
-  timeoutSeconds: 5
