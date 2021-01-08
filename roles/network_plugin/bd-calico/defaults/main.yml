@@ -91,7 +91,3 @@ typha_max_connections_lower_limit: 300
 typha_secure: false
 
 calico_feature_control: {}
-
-# fixedip-ipam server config
-fixedip_ipam_server_service: ""
-fixedip_ipam_server_port: 6109
