@@ -113,3 +113,11 @@
     - ansible_distribution in ["CentOS","RedHat","OracleLinux"]
   tags:
     - bootstrap-os
+
+- import_tasks: 0200-platform_requirements.yml
+  when:
+    - not dns_late
+    - ansible_distribution in ["CentOS","RedHat"]
+    - containeros_cluster
+  tags:
+    - bootstrap-os

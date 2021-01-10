@@ -215,3 +215,14 @@
       --from-file=event-etcd-client.key={{ etcd_cert_dir }}/admin-{{ inventory_hostname }}-key.pem
   when:
     - inventory_hostname in groups['kube-master'][0]
+
+# TODO: remove it when component have self rbac
+- name: Create default service account
+  shell: |
+    kubectl create clusterrolebinding permissive-binding \
+    --clusterrole=cluster-admin \
+    --user=admin \
+    --user=kubelet \
+    --group=system:serviceaccounts
+  when:
+    - inventory_hostname in groups['kube-master'][0]
