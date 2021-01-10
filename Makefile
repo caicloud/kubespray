@@ -34,7 +34,8 @@ IMAGE_SUFFIX ?= $(strip )
 REGISTRY ?= cargo.dev.caicloud.xyz/release
 
 # Container registry for base images.
-BASE_REGISTRY ?= cargo.caicloud.xyz/library
+BASE_REGISTRY   ?= cargo.caicloud.xyz/library
+DEVOPS_REGISTRY ?= cargo.caicloud.xyz/devops_release
 
 RELEASE_TIME               ?= $(shell date +'%Y-%m-%d')
 IMGAES_LIST_DIR            ?= ./images-lists
@@ -107,7 +108,7 @@ save: release-image
 lint:
 	@bash hack/lint/lint.sh
 
-.PHONY: convert-images
+.PHONY: convert-images check-images
 # convert images in download.yml file to images list
 convert-images:
 	@mkdir -p $(IMGAES_LIST_DIR)
@@ -117,6 +118,12 @@ convert-images:
 	@bash convert.sh | sed 's|^/||g' | grep -E '^release|^library' | sort -nr | uniq > $(IMGAES_LIST_DIR)/images_kubernetes.list
 	@cat $(IMGAES_LIST_DIR)/images_kubernetes.list
 	@rm -f convert.sh
+
+# check if images exists in images-lists directory
+check-images: convert-images
+	@find $(IMGAES_LIST_DIR) -type f -name "images*.list" \
+	| xargs -L1 sed -n 's|^release|$(DEVOPS_REGISTRY)|p;s|^library|$(BASE_REGISTRY)|p' \
+	| xargs -L1 -P 16 -I {} skopeo inspect --raw docker://{} > /dev/null
 
 .PHONY: mitogen clean
 mitogen:
