@@ -29,7 +29,7 @@
 {% elif fixedip_enabled %}
       "ipam": {
         "type": "fixedip-ipam",
-        "server": "http://{{ fixedip_ipam_server_service }}:{{ fixedip_ipam_server_port }}"
+        "config": "fixedip-ipam-config"
       },
 {% else %}
       "ipam": {
