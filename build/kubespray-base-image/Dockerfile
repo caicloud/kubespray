@@ -7,7 +7,7 @@ RUN apt update -y && \
     libssl-dev python3-dev sshpass apt-transport-https jq moreutils \
     ca-certificates curl gnupg2 software-properties-common python3-pip rsync vim \
     && rm -rf /var/lib/apt/lists/* \
-    && curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.3/bin/linux/amd64/kubectl \
+    && curl -LO https://storage.googleapis.com/kubernetes-release/release/v1.19.6/bin/linux/amd64/kubectl \
     && chmod a+x kubectl && mv kubectl /usr/local/bin/kubectl
 COPY requirements.txt .
 COPY tests/requirements.txt ./tests/
