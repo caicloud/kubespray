@@ -30,13 +30,6 @@
     \cp {{ resources_temp_dir.path }}/{{ item }} /etc/kubernetes/manifests/{{ item }} && \
     chown root:root /etc/kubernetes/manifests/{{ item }} && \
     chmod 600 /etc/kubernetes/manifests/{{ item }}
-  copy:
-    src: "{{ resources_temp_dir.path }}/{{ item }}"
-    dest: "/etc/kubernetes/manifests/{{ item }}"
-    owner: "root"
-    group: "root"
-    mode: "0600"
-    force: yes
   with_items:
     - kube-apiserver.yaml
     - kube-controller-manager.yaml
