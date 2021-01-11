@@ -89,6 +89,10 @@ function sync_images() {
 # Load dependence image
 function load_deploy_image() {
   IMAGE_FILE_PATH=`find ./resources/images/save -name "${DEPLOY_CONTAINER_NAME}*"`
+  if file ${IMAGE_FILE_PATH} | grep -Eqi "gzip compressed data"; then
+    gzip -d ${IMAGE_FILE_PATH}
+    IMAGE_FILE_PATH=`find ./resources/images/save -name "${DEPLOY_CONTAINER_NAME}*"`
+  fi
   IMAGE_FALL_NAME=`ctr i import ${IMAGE_FILE_PATH} | grep ${DEPLOY_CONTAINER_NAME} | awk '{print $2}'`
 }
 
