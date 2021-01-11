@@ -19,6 +19,8 @@ CONFIG_PATH=${DEPLOY_HOME}/config
 SSH_CERT_PATH=${CONFIG_PATH}/ssh_cert
 CONTAINER_MOUNT_PATH=${DEPLOY_HOME}/container_config
 
+: ${LOG_PATH:="None"}
+
 if [[ -f ${CONTAINER_MOUNT_PATH}/env.yml ]] && [[ -f ${CONTAINER_MOUNT_PATH}/inventory ]]; then
   mkdir -p ${CONFIG_PATH}
   cp -f ${CONTAINER_MOUNT_PATH}/env.yml ${CONFIG_PATH}/env.yml
@@ -46,7 +48,7 @@ function ssh_certs() {
 }
 
 function check_log() {
-  if [[ ${LOG_PATH} ]]; then
+  if [[ ${LOG_PATH} != "None" ]]; then
     unreachable_count=$(cat ${LOG_PATH} | grep "unreachable" | grep "failed" | awk '{print $5}' | uniq | wc -l)
     failed_count=$(cat ${LOG_PATH} | grep "unreachable" | grep "failed" | awk '{print $6}' | uniq | wc -l)
     if [[ ${unreachable_count} -eq 1 ]] && [[ ${failed_count} -eq 1 ]]; then

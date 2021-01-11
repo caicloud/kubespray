@@ -60,8 +60,8 @@ mkdir -p ${PRODUCT_DEPLOY_DIR}/common/containerd
 
 # Stop firewalld
 echo -e "$GREEN_COL \tStop firewalld $NORMAL_COL"
-systemctl stop firewalld
-systemctl disable firewalld
+systemctl stop firewalld || true
+systemctl disable firewalld || true
 
 # Disable selinux
 echo -e "$GREEN_COL \tDisable selinux $NORMAL_COL"
