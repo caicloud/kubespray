@@ -176,8 +176,8 @@ spec:
                                 ansible -i /jenkins/ansible/inventory cargo -m shell -a "rm -f /kubespray.tar.gz; rm -rf /kubespray; mkdir -p /kubespray"
                                 ansible -i /jenkins/ansible/inventory cargo -m copy -a "src=./kubespray.tar.gz dest=/"
                                 ansible -i /jenkins/ansible/inventory cargo -m shell -a "tar xpf /kubespray.tar.gz -C /kubespray && rm -f /kubespray.tar.gz"
-                                ansible -i /jenkins/ansible/inventory cargo -m shell -a "cd /kubespray && make push REGISTRY=${KUBESPRAY_REGISTRY} VERSION=${RELEASE_VERSION}"
-                                ansible -i /jenkins/ansible/inventory cargo -m shell -a "cd /kubespray && make save REGISTRY=${KUBESPRAY_REGISTRY} VERSION=${RELEASE_VERSION} SAVE_PATH=${PACKING_DIR}/${PACKAGE_NAME}/files"
+                                ansible -i /jenkins/ansible/inventory cargo -m shell -a "cd /kubespray && make push REGISTRY=${KUBESPRAY_REGISTRY} VERSION=${RELEASE_VERSION}-${TAG_SUFFIX}"
+                                ansible -i /jenkins/ansible/inventory cargo -m shell -a "cd /kubespray && make save REGISTRY=${KUBESPRAY_REGISTRY} VERSION=${RELEASE_VERSION}-${TAG_SUFFIX} SAVE_PATH=${PACKING_DIR}/${PACKAGE_NAME}/files"
                             """
                         }
 
