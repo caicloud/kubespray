@@ -70,21 +70,25 @@ do
         # push to same project
         TARGET_PROJECT=${SOURCE_PROJECT}
         NEW_IMAGE=${TARGET_REGISTRY}/${TARGET_PROJECT}/${IMAGE_NAME}
-        # pull images
-        docker pull ${SOURCE_REGISTRY}/${line}
+        # inspect images
+        skopeo inspect docker://${SOURCE_REGISTRY}/${line} --raw --retry-times 3 > /dev/null
         if [[ $? != 0 ]]; then
             echo -e "$RED_COL Pull image ${SOURCE_REGISTRY}/${line} error... $NORMAL_COL"
             echo ${SOURCE_REGISTRY}/$line >> miss_image.txt
         else
         echo -e "$GREEN_COL ${SOURCE_REGISTRY}/${line} successfully pulled $NORMAL_COL"
         fi
-        docker tag ${SOURCE_REGISTRY}/$line $NEW_IMAGE
-
-        # push images
-        docker push $NEW_IMAGE
+        # copy images from ${SOURCE_REGISTRY} to ${TARGET_REGISTRY}
+        skopeo copy docker://${SOURCE_REGISTRY}/$line docker://$NEW_IMAGE --retry-times 3
         if [[ $? != 0 ]]; then
-            echo -e "$RED_COL Push image ${NEW_IMAGE} error... $NORMAL_COL"
-            echo "${NEW_IMAGE}" >> miss_push_image.txt
+            sleep 3s
+            skopeo copy docker://${SOURCE_REGISTRY}/$line docker://$NEW_IMAGE
+            if [[ $? != 0 ]]; then
+                echo -e "$RED_COL Push image ${NEW_IMAGE} error... $NORMAL_COL"
+                echo "${NEW_IMAGE}" >> miss_push_image.txt
+            else
+            echo -e "$GREEN_COL ${NEW_IMAGE} successfully pushed $NORMAL_COL"
+            fi
         else
         echo -e "$GREEN_COL ${NEW_IMAGE} successfully pushed $NORMAL_COL"
         fi
