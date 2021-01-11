@@ -166,7 +166,7 @@ spec:
 
                             sh """
                                 ansible -i /jenkins/ansible/inventory cargo -m shell -a "rm -rf ${PACKING_DIR} || true; mkdir -p ${PACKING_DIR}"
-                                ansible -i /jenkins/ansible/inventory cargo -m shell -a "cd ${PACKING_DIR}; mkdir -p ${PACKAGE_NAME}/ssh_certs ${PACKAGE_NAME}/tools ${PACKAGE_NAME}/files ${PACKAGE_NAME}/registry_ca_cert"
+                                ansible -i /jenkins/ansible/inventory cargo -m shell -a "cd ${PACKING_DIR}; mkdir -p ${PACKAGE_NAME}/ssh_cert ${PACKAGE_NAME}/tools ${PACKAGE_NAME}/files ${PACKAGE_NAME}/registry_ca_cert"
                             """
                         }
 
