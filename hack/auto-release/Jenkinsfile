@@ -166,7 +166,7 @@ spec:
 
                             sh """
                                 ansible -i /jenkins/ansible/inventory cargo -m shell -a "rm -rf ${PACKING_DIR} || true; mkdir -p ${PACKING_DIR}"
-                                ansible -i /jenkins/ansible/inventory cargo -m shell -a "cd ${PACKING_DIR}; mkdir -p ${PACKAGE_NAME}/ssh_certs ${PACKAGE_NAME}/tools ${PACKAGE_NAME}/files"
+                                ansible -i /jenkins/ansible/inventory cargo -m shell -a "cd ${PACKING_DIR}; mkdir -p ${PACKAGE_NAME}/ssh_certs ${PACKAGE_NAME}/tools ${PACKAGE_NAME}/files ${PACKAGE_NAME}/registry_ca_cert"
                             """
                         }
 
@@ -200,6 +200,7 @@ spec:
                         stage("Add install script and tools") {
                             sh """
                                 ansible -i /jenkins/ansible/inventory cargo -m shell -a "cp /kubespray/config/inventory ${PACKING_DIR}/${PACKAGE_NAME}/inventory.sample"
+                                ansible -i /jenkins/ansible/inventory cargo -m shell -a "cp /kubespray/config/env.yml ${PACKING_DIR}/${PACKAGE_NAME}/env.yml.sample"
                                 ansible -i /jenkins/ansible/inventory cargo -m shell -a "cp /kubespray/hack/k8s-installer/install.sh ${PACKING_DIR}/${PACKAGE_NAME}"
                                 ansible -i /jenkins/ansible/inventory cargo -m shell -a "cp -rf ${TOOLS_DIR} ${PACKING_DIR}/${PACKAGE_NAME}"
                             """

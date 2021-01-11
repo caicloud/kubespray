@@ -17,9 +17,8 @@ DEPLOY_ROOT=$(cd $(dirname "${BASH_SOURCE}")/ && pwd -P)
 CONFIG_DIR=${DEPLOY_ROOT}/.config
 SSH_CERT_DIR=${DEPLOY_ROOT}/ssh_cert
 DEPLOY_CONTAINER_NAME="cluster-deploy-job"
-IMAGE_SYNC_WORK_DIR="${DEPLOY_ROOT}/resources/images/data"
-TOOLS_DIR="${DEPLOY_ROOT}/resources/bin"
-IMGAE_SYNC_DIR="${DEPLOY_ROOT}/resources/images/tmp"
+TOOLS_DIR="${DEPLOY_ROOT}/tools"
+IMGAE_SYNC_DIR="${DEPLOY_ROOT}/skopeo"
 REGISTRY_AUTH_USERNAME=`cat env.yml | grep image_registry_username | awk '{print $2}' | sed 's#"##g'`
 REGISTRY_AUTH_PASSWORD=`cat env.yml | grep image_registry_password | awk '{print $2}' | sed 's#"##g'`
 
@@ -63,9 +62,9 @@ cp ${CARGO_CFG_CA_PATH} ${CONFIG_DIR}/registry_ca_cert/registry-ca.crt
 # syncImages sync the images to registry
 function sync_images() {
   echo -e "$YELLOW_COL load images $NORMAL_COL"
-  cd ${IMAGE_SYNC_WORK_DIR}
   rm -rf "${IMGAE_SYNC_DIR}" || mkdir -p ${IMGAE_SYNC_DIR}
   ${TOOLS_DIR}/skopeo login ${CARGO_CFG_DOMAIN} -u "${REGISTRY_AUTH_USERNAME}" -p "${REGISTRY_AUTH_PASSWORD}"
+  tar -xf images.tar.gz
   BLOB_DIR="docker/registry/v2/blobs/sha256"
   REPO_DIR="docker/registry/v2/repositories"
   for image in $(find ${REPO_DIR} -type d -name "current"); do
@@ -82,22 +81,22 @@ function sync_images() {
     ${TOOLS_DIR}/skopeo sync --insecure-policy --src-tls-verify=false --dest-tls-verify=false \
     --src dir --dest docker ${IMGAE_SYNC_DIR}/${project} ${CARGO_CFG_DOMAIN}/${project} > /dev/null
   done
-  rm -rf "${IMGAE_SYNC_DIR}"
+  rm -rf "${IMGAE_SYNC_DIR}" docker
   cd ${DEPLOY_ROOT}
 }
 
 # Load dependence image
 function load_deploy_image() {
-  IMAGE_FILE_PATH=`find ./resources/images/save -name "${DEPLOY_CONTAINER_NAME}*"`
+  IMAGE_FILE_PATH=`find ./files -name "${DEPLOY_CONTAINER_NAME}*"`
   if file ${IMAGE_FILE_PATH} | grep -Eqi "gzip compressed data"; then
     gzip -d ${IMAGE_FILE_PATH}
-    IMAGE_FILE_PATH=`find ./resources/images/save -name "${DEPLOY_CONTAINER_NAME}*"`
+    IMAGE_FILE_PATH=`find ./files -name "${DEPLOY_CONTAINER_NAME}*"`
   fi
   IMAGE_FALL_NAME=`ctr i import ${IMAGE_FILE_PATH} | grep ${DEPLOY_CONTAINER_NAME} | awk '{print $2}'`
 }
 
 function push_deploy_image() {
-  IMAGE_NAME=`echo ${IMAGE_FALL_NAME} | awk -F '/release/' '{print $NF}'`
+  IMAGE_NAME=`echo ${IMAGE_FALL_NAME} | awk -F '/library/' '{print $NF}'`
   ctr i tag ${IMAGE_FALL_NAME} ${CARGO_CFG_DOMAIN}/release/${IMAGE_NAME} || true
   ctr i push -u ${REGISTRY_AUTH_USERNAME}:${REGISTRY_AUTH_PASSWORD} ${CARGO_CFG_DOMAIN}/release/${IMAGE_NAME}
 }
