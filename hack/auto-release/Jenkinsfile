@@ -1,14 +1,18 @@
 // params defined in Jenkins pipeline setting
-def USER = "${params.packing_host_user}"
-def HOST = "${params.packing_host_add}"
-def PASSWORD = "${params.packing_host_pass}"
 def KUBESPRAY_BRANCH = "${params.kubespray_branch}"
 def RELEASE_VERSION = "${params.release_version}"
 def PACKING_DIR = "${params.packing_dir}"
+def TOOLS_DIR = "${params.tools_dir}"
+def TAG_SUFFIX = "${params.tag_suffix}"
+def PACKAGE_NAME = "k8s-installer-${RELEASE_VERSION}-${TAG_SUFFIX}"
+
+// basic settings, use default if not changed
+def USER = "${params.packing_host_user}"
+def HOST = "${params.packing_host_add}"
+def PASSWORD = "${params.packing_host_pass}"
 def SAVE_HOST = "${params.save_host}"
 def SAVE_USER = "${params.save_user}"
 def SAVE_PATH = "${params.save_path}"
-def PACKAGE_NAME = "k8s-installer-${RELEASE_VERSION}"
 def GITHUB_CREDENTIAL_ID = "${params.github_credential_id}"
 def GIT_EMAIL = "${params.git_email}"
 def SOURCE_REGISTRY = "${params.source_registry}"
@@ -18,7 +22,6 @@ def TARGET_REGISTRY_CREDENTIAL_ID = "${params.target_registry_credential_id}"
 def RELEASE_REGISTRY = "${params.release_registry}"
 def RELEASE_REGISTRY_CREDENTIAL_ID = "${params.release_registry_credential_id}"
 def KUBESPRAY_REGISTRY = "${params.kubespray_registry}"
-def TOOLS_DIR="${params.tools_dir}"
 
 // define lark config
 def LARK_CHANNEL_TOKEN = "${params.lark_channel_token}"
@@ -104,10 +107,11 @@ spec:
                                     # Prepare git email for CLA.
                                     git config --global user.email ${GIT_EMAIL}
                                     git fetch upstream
-                                    git reset --hard upstream/${BASE_BRANCH}
+                                    git reset --hard upstream/${KUBESPRAY_BRANCH}
                                 """
                             }
                         }
+
                         if (params.update_images_list){
                             stage("Generate images list PR") {
                                 withCredentials([usernamePassword(credentialsId: "${GITHUB_CREDENTIAL_ID}", passwordVariable: "GITHUB_TOKEN", usernameVariable: "GITHUB_USERNAME")]) {
@@ -127,7 +131,7 @@ spec:
                                         "title": "[Auto pushed by Jenkins]: update ${RELEASE_VERSION} images lists",
                                         "body": "**What this PR does / why we need it**:\\n\\nupdate ${RELEASE_VERSION} images lists\\n\\n**Special notes for your reviewer**:\\n\\n/cc @caicloud/platform-release \\n\\n```release-note\\nNONE\\n```",
                                         "head": "${GITHUB_USERNAME}:${RELEASE_VERSION}-images",
-                                        "base": "${BASE_BRANCH}"
+                                        "base": "${KUBESPRAY_BRANCH}"
                                         }' \
                                         > pull_info.txt
                                         cat pull_info.txt | grep pulls | grep '\"url\"' | awk -F' ' '{print\$2}' | sed 's# ##g;s#,##g;s#\"##g' > api_pull_url.txt
@@ -145,15 +149,17 @@ spec:
                             }
                         }
 
-                        stage("Generate repo tag") {
-                            sh """
-                                git fetch upstream
-                                git checkout upstream/${KUBESPRAY_BRANCH}
-                                git checkout -B ${RELEASE_VERSION}
-                                git reset --hard upstream/${KUBESPRAY_BRANCH}
-                                git tag ${RELEASE_VERSION} --force
-                                git push upstream --tags --force
-                            """
+                        if (params.update_repo_tag){
+                            stage("Generate repo tag") {
+                                sh """
+                                    git fetch upstream
+                                    git checkout upstream/${KUBESPRAY_BRANCH}
+                                    git checkout -B ${RELEASE_VERSION}-tag
+                                    git reset --hard upstream/${KUBESPRAY_BRANCH}
+                                    git tag ${RELEASE_VERSION}-${TAG_SUFFIX} --force
+                                    git push upstream --tags --force
+                                """
+                            }
                         }
 
                         stage("Create k8s-installer directory") {
@@ -221,9 +227,9 @@ spec:
                 }
             }
         } catch (Exception e) {
-        MESSAGE = "【Failed】Jenkins Job ${JOB_NAME}-${BUILD_NUMBER} Link: ${BUILD_URL}"
-        sendLarkMessage("${MESSAGE}")
-        throw e
+            MESSAGE = "【Failed】Jenkins Job ${JOB_NAME}-${BUILD_NUMBER} Link: ${BUILD_URL}"
+            sendLarkMessage("${MESSAGE}")
+            throw e
         }
     }
 }
