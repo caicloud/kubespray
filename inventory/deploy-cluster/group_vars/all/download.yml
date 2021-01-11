@@ -20,7 +20,7 @@ quay_image_repo: "{{ image_registry_domain }}/{{ image_registry_project_release 
 release_image_repo: "{{ image_registry_domain }}/{{ image_registry_project_release }}"
 
 # Image version
-kube_version: v1.19.3
+kube_version: v1.19.6
 calico_version: "v3.17.0"
 multus_version: "v3.6.2-rc.1"
 pod_infra_version: "3.2"
