@@ -4,3 +4,7 @@ required_pkgs:
   - device-mapper-libs
   - nss
   - conntrack
+
+container_os_required_pkgs:
+  - lvm2
+  - "{{ ( support_gluster_volume | bool ) | ternary('glusterfs-cli-{{ glusterfs_version }}', 'vim') }}"

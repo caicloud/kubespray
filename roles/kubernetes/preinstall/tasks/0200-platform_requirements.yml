@@ -1,0 +1,20 @@
+# Install platform dependency packages
+- name: Install platfrom dependency packages requirements
+  action:
+    module: "{{ ansible_pkg_mgr }}"
+    name: "{{ container_os_required_pkgs | default([]) }}"
+    state: latest
+  register: pkgs_task_result
+  until: pkgs_task_result is succeeded
+  retries: 4
+  delay: "{{ retry_stagger | random + 3 }}"
+
+# Temporary use
+# TODO(WangMinjie114): Addon component create mongo db path 
+- name: Create mongo db path
+  file:
+    path: "/var/lib/compass/db/mongo"
+    state: directory
+  when:
+    - create_mongo_db_path == true
+    - deploy_control_cluster
