@@ -3,7 +3,9 @@ spec:
   template:
     spec:
       containers:
-      - resources:
+      - name: kube-proxy
+        image: {{ kube_proxy_image_repo }}:{{ kube_version }}
+        resources:
           requests:
             cpu: {{ kube_proxy_cpu_requests }}
             memory: {{ kube_proxy_memory_requests }}
