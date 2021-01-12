@@ -196,3 +196,9 @@ kube_feature_gates: ["RotateKubeletServerCertificate=true"]
 kube_apiserver_cpu_requests: "250m"
 kube_controller_manager_cpu_requests: "200m"
 kube_scheduler_cpu_requests: "100m"
+
+kube_proxy_cpu_requests: "300m"
+kube_proxy_memory_requests: "25Mi"
+
+kube_proxy_cpu_limits: "1500m"
+kube_proxy_memory_limits: "100Mi"

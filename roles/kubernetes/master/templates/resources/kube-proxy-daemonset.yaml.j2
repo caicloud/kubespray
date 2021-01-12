@@ -1,0 +1,15 @@
+{% if kube_proxy_cpu_requests and kube_proxy_memory_requests and kube_proxy_cpu_limits and kube_proxy_memory_limits %}
+spec:
+  template:
+    spec:
+      containers:
+      - name: kube-proxy
+        image: {{ kube_proxy_image_repo }}:{{ kube_version }}
+        resources:
+          requests:
+            cpu: {{ kube_proxy_cpu_requests }}
+            memory: {{ kube_proxy_memory_requests }}
+          limits:
+            cpu: {{ kube_proxy_cpu_limits }}
+            memory: {{ kube_proxy_memory_limits }}
+{% endif %}

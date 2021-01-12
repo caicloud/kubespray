@@ -13,6 +13,7 @@
     - kube-apiserver-resources.yaml
     - kube-controller-manager-resources.yaml
     - kube-scheduler-resources.yaml
+    - kube-proxy-daemonset.yaml
 
 - name: Modify static pod config
   shell:
@@ -38,6 +39,16 @@
     - "Master | Restart kube-controller-manager"
     - "Master | Restart kube-scheduler"
     - "Master | Restart apiserver"
+
+- name: Config kube-proxy daemonset config
+  shell: |
+    {{ bin_dir }}/kubectl --kubeconfig {{ kube_config_dir }}/admin.conf -n kube-system patch daemonset kube-proxy -p "$(cat {{ resources_temp_dir.path }}/kube-proxy-daemonset.yaml)"
+  register: patch_status
+  until: patch_status.rc == 0
+  retries: 30
+  delay: 10
+  when:
+    - inventory_hostname in groups['kube-master'][0]
 
 - name: Cleanup temporary directory
   file:
