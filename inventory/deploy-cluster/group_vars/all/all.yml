@@ -120,4 +120,4 @@ create_mongo_db_path: true
 
 # Whether gluster volume support
 support_gluster_volume: false
-glusterfs_version: "3.10.5"
+glusterfs_version: "7.x"
