@@ -6,7 +6,7 @@ metadata:
   labels:
     release.containeros.dev/config-type: system-info
 data:
-  clusterDeployVersion: ""
+  clusterDeployVersion: "{{ cluster_deploy_job_version }}"
   downloadURL: "{{ download_url }}"
   # image registry config
   imageRegistryIP: "{{ image_registry_ip }}"

@@ -83,6 +83,7 @@ case $input in
 # TODO: add install layer
     echo -e "${GREEN_COL}       ############ Start install cluster ################       ${NORMAL_COL}"
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
+      -e cluster_deploy_job_version=${IMAGE_TAG} \
       cluster.yml
     check_log
     ;;
@@ -97,6 +98,7 @@ case $input in
     NODE_NAME=$2
     echo -e "${GREEN_COL}       ############ Start add work node ##################       ${NORMAL_COL}"
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
+      -e cluster_deploy_job_version=${IMAGE_TAG} \
       --limit=${NODE_NAME} \
       scale.yml
     check_log
@@ -116,6 +118,7 @@ case $input in
   add-master )
     echo -e "${GREEN_COL}       ############ Start add master node ################       ${NORMAL_COL}"
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
+      -e cluster_deploy_job_version=${IMAGE_TAG} \
       cluster.yml
     # restart every node nginx service
     ansible -i ${INVENTORY_PATH}/inventory kube-node -m shell -a "crictl ps | grep nginx-proxy | awk '{print \$1}' | xargs -I {} crictl exec {} nginx -s reload"
@@ -136,11 +139,13 @@ case $input in
     # add etcd node
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       --limit=etcd,kube-master -e ignore_assert_errors=yes -e etcd_retries=20 \
+      -e cluster_deploy_job_version=${IMAGE_TAG} \
       cluster.yml
 
     # update etcd config in cluster
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
       --limit=etcd,kube-master -e ignore_assert_errors=yes -e etcd_retries=20 \
+      -e cluster_deploy_job_version=${IMAGE_TAG} \
       upgrade-cluster.yml
     
     check_log
@@ -152,14 +157,17 @@ case $input in
     EXTERNEL_CONFIG=""
     [[ $# == "3" ]] && [[ x$3 == "xnot-reset" ]] && EXTERNEL_CONFIG="-e reset_nodes=false" || true
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
-      -e node="${NODE_NAME}" -e delete_nodes_confirmation=yes ${EXTERNEL_CONFIG} \
+      -e node="${NODE_NAME}" -e delete_nodes_confirmation=yes -e cluster_deploy_job_version=${IMAGE_TAG} \
+      ${EXTERNEL_CONFIG} \
       remove-node.yml
 
     # modify etcd node message
     sed -i "${NODE_NAME}/d" ${INVENTORY_PATH}/inventory
 
     # update etcd config in cluster
-    ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" cluster.yml
+    ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
+      -e cluster_deploy_job_version=${IMAGE_TAG} \
+      cluster.yml
 
     check_log
     ;;
