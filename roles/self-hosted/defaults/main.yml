@@ -30,3 +30,5 @@ self_hosted_config_dir: "/etc/kubernetes/self_hosted"
 cluster_identity_name: "kubernetes-stack"
 
 etcd_cert_dir: "/etc/ssl/etcd/ssl"
+
+cluster_deploy_job_version: ""

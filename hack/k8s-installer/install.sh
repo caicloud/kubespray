@@ -17,6 +17,7 @@ DEPLOY_ROOT=$(cd $(dirname "${BASH_SOURCE}")/ && pwd -P)
 CONFIG_DIR=${DEPLOY_ROOT}/.config
 SSH_CERT_DIR=${DEPLOY_ROOT}/ssh_cert
 DEPLOY_CONTAINER_NAME="cluster-deploy-job"
+IMAGE_TAG=""
 TOOLS_DIR="${DEPLOY_ROOT}/tools"
 IMGAE_SYNC_DIR="${DEPLOY_ROOT}/skopeo"
 REGISTRY_AUTH_USERNAME=`cat env.yml | grep image_registry_username | awk '{print $2}' | sed 's#"##g'`
@@ -93,6 +94,7 @@ function load_deploy_image() {
     IMAGE_FILE_PATH=`find ./files -name "${DEPLOY_CONTAINER_NAME}*"`
   fi
   IMAGE_FALL_NAME=`ctr i import ${IMAGE_FILE_PATH} | grep ${DEPLOY_CONTAINER_NAME} | awk '{print $2}'`
+  IMAGE_TAG=`echo ${IMAGE_FALL_NAME} | awk -F ':' '{print $NF}'`
 }
 
 function push_deploy_image() {
@@ -109,6 +111,7 @@ function cluster_deploy() {
   ctr containers rm ${DEPLOY_CONTAINER_NAME} >/dev/null 2>&1 || true
   ctr run -t --rm \
     --net-host \
+    --env IMAGE_TAG=${IMAGE_TAG} \
     --mount type=bind,src=${CONFIG_DIR},dst=/kubespray/config,options=rbind:rw \
     ${IMAGE_FALL_NAME} \
     ${DEPLOY_CONTAINER_NAME} \
