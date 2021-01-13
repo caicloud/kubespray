@@ -99,7 +99,7 @@
 
 - name: Modify kubeconfig when cluster_vip is defined
   shell: |
-    sed -i "s#{{ hostvars[groups['bastion'][0]]['ansible_host'] }}#{{ cluster_vip }}#g" {{ local_vip_kubeconfig_file }}
+    sed -i "s#{{ hostvars[groups['kube-master'][0]]['ansible_host'] }}#{{ cluster_vip }}#g" {{ local_vip_kubeconfig_file }}
   delegate_to: localhost
   when:
     - cluster_vip is defined
