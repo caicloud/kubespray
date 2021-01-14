@@ -27,6 +27,20 @@
     - cos_running_namespaces not in ["default", "kube-system", "kube-node-lease", "kube-public"]
     - inventory_hostname in groups['kube-master'][0]
 
+# Add label on master node
+- name: Add label on master node
+  shell: |
+    kubectl label node {{ inventory_hostname }} {{ item }}
+  with_items:
+    - node-role.release.containeros.dev/primary-master=true
+    - node-role.release.containeros.dev/primary-etcd=true
+  register: label_status
+  until: label_status.rc == 0
+  retries: 30
+  delay: 10
+  when:
+    - inventory_hostname in groups['kube-master'][0]
+
 # Ensure self-hosted config dir exist
 - name: Ensure self-hosted config dir exist
   file:
@@ -121,7 +135,7 @@
     - system-info-cm.yml
     - cluster-config-info-cm.yml
   when:
-    - deploy_control_cluster
+    - deploy_control_cluster|bool
     - inventory_hostname in groups['kube-master'][0]
 
 - name: Apply cm system-info to cluster
@@ -139,7 +153,7 @@
       type: cm
       file: cluster-config-info-cm.yml
   when:
-    - deploy_control_cluster
+    - deploy_control_cluster|bool
     - inventory_hostname in groups['kube-master'][0]
 
 # Create cluster-info configmap
@@ -170,7 +184,7 @@
 - name: Create VIP
   import_tasks: create-vip.yml
   when:
-    - not deploy_control_cluster
+    - not deploy_control_cluster|bool
     - groups['kube-master'] | length > 1
     - inventory_hostname in groups['kube-master'][0]
     - cluster_vip != ""
@@ -189,7 +203,7 @@
     - cluster-crd-patch.yml
   delegate_to: localhost
   when:
-    - not deploy_control_cluster
+    - not deploy_control_cluster|bool
     - inventory_hostname in groups['kube-master'][0]
 
 # TODO: Modify kube.py, support kubectl patch
@@ -200,7 +214,7 @@
     - cluster-crd-patch.yml
   delegate_to: localhost
   when:
-    - not deploy_control_cluster
+    - not deploy_control_cluster|bool
     - inventory_hostname in groups['kube-master'][0]
 
 - name: Create etcd tls secret
