@@ -60,3 +60,8 @@ spec:
         - name: keepalived-config
           configMap:
             name: cluster-vip-configmap
+      tolerations:
+      - operator: "Exists"
+        effect: "NoExecute"
+      - operator: "Exists"
+        effect: "NoSchedule"
