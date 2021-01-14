@@ -163,3 +163,21 @@
   shell: dracut --force
   when:
     - containeros_cluster == true
+
+- name: Stop kernel nouveau module
+  shell: |
+    if lsmod | grep -q nouveau; then
+      rmmod -f nouveau
+      lsmod | grep -q nouveau && exit 1
+    fi
+  register: mod_nouveau_status
+  when:
+    - containeros_cluster | bool
+  ignore_errors: true
+
+- name: Ensure kernel nouveau module is stoped
+  assert:
+    that: mod_nouveau_status.rc == 0
+    fail_msg: "Stop kernel nouveau module failed, Please reboot host system."
+  when:
+    - containeros_cluster | bool
