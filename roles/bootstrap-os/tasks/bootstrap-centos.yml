@@ -167,9 +167,11 @@
 - name: Stop kernel nouveau module
   shell: |
     if lsmod | grep -q nouveau; then
-      rmmod -f nouveau
+      rmmod nouveau
       lsmod | grep -q nouveau && exit 1
     fi
+  args:
+    executable: /bin/bash
   register: mod_nouveau_status
   when:
     - containeros_cluster | bool
