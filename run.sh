@@ -111,7 +111,7 @@ case $input in
     EXTERNEL_CONFIG=""
     [[ $# == "3" ]] && [[ x$3 == "xnot-reset" ]] && EXTERNEL_CONFIG="-e reset_nodes=false" || true
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
-      -e node=${NODE_NAME} -e delete_nodes_confirmation=yes ${EXTERNEL_CONFIG} \
+      -e node=${NODE_NAME} -e delete_nodes_confirmation=yes ${EXTERNEL_CONFIG} --skip-tags='mounts' \
       remove-node.yml
     check_log
     ;;
@@ -130,7 +130,7 @@ case $input in
     EXTERNEL_CONFIG=""
     [[ $# == "3" ]] && [[ x$3 == "xnot-reset" ]] && EXTERNEL_CONFIG="-e reset_nodes=false" || true
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
-      -e node=${NODE_NAME} -e delete_nodes_confirmation=yes ${EXTERNEL_CONFIG} \
+      -e node=${NODE_NAME} -e delete_nodes_confirmation=yes ${EXTERNEL_CONFIG} --skip-tags='mounts'\
       remove-node.yml
     check_log
     ;;
@@ -157,7 +157,7 @@ case $input in
     EXTERNEL_CONFIG=""
     [[ $# == "3" ]] && [[ x$3 == "xnot-reset" ]] && EXTERNEL_CONFIG="-e reset_nodes=false" || true
     ansible-playbook -i ${INVENTORY_PATH}/inventory -e "@${INVENTORY_PATH}/env.yml" \
-      -e node="${NODE_NAME}" -e delete_nodes_confirmation=yes -e cluster_deploy_job_version=${IMAGE_TAG} \
+      -e node="${NODE_NAME}" -e delete_nodes_confirmation=yes -e cluster_deploy_job_version=${IMAGE_TAG} --skip-tags='mounts' \
       ${EXTERNEL_CONFIG} \
       remove-node.yml
 
