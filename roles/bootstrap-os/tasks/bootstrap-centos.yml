@@ -55,7 +55,7 @@
   shell: |
     yum clean all | true && mv /etc/yum.repos.d /etc/yum.repos.d.`date +"%Y-%m-%d-%H-%M-%S"`.bak && mkdir -p /etc/yum.repos.d
   when:
-    - containeros_cluster == true
+    - containeros_cluster|bool
 
 ## 2/3 Config infra mirrors
 - name: Config infra mirrors
@@ -63,14 +63,14 @@
     url: "{{ download_url }}/sources/CentOS-{{ ansible_distribution_major_version }}-All-In-One.repo"
     dest: /etc/yum.repos.d/CentOS-{{ ansible_distribution_major_version }}-All-In-One.repo
   when:
-    - containeros_cluster == true
+    - containeros_cluster|bool
 
 ## 3/3 Config infra mirrors
 - name: Modify mirrors
   shell: |
     sed -i "s#__download_url__#{{ download_url }}#g" /etc/yum.repos.d/CentOS-{{ ansible_distribution_major_version }}-All-In-One.repo && yum clean all && yum makecache
   when:
-    - containeros_cluster == true
+    - containeros_cluster|bool
 
 # CentOS ships with python installed
 
@@ -157,12 +157,12 @@
     src: nvidia-nouveau.conf
     dest: /etc/modprobe.d/blacklist-nouveau.conf
   when:
-    - containeros_cluster == true
+    - containeros_cluster|bool
 
 - name: Regenerate the kernel initramfs
   shell: dracut --force
   when:
-    - containeros_cluster == true
+    - containeros_cluster|bool
 
 - name: Remove nouveau kernel module
   shell: |

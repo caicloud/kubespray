@@ -16,5 +16,5 @@
     path: "/var/lib/compass/db/mongo"
     state: directory
   when:
-    - create_mongo_db_path == true
+    - create_mongo_db_path|bool
     - deploy_control_cluster
