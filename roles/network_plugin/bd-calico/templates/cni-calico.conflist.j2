@@ -26,7 +26,7 @@
         "type": "host-local",
         "subnet": "usePodCidr"
       },
-{% elif fixedip_enabled %}
+{% elif fixedip_enabled | bool %}
       "ipam": {
         "type": "fixedip-ipam",
         "config": "fixedip-ipam-config"

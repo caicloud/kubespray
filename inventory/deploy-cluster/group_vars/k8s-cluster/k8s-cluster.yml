@@ -348,10 +348,6 @@ kube_apiserver_bind_address: "0.0.0.0"
 kube_controller_manager_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
 kube_scheduler_bind_address: "{{ ip | default(fallback_ips[inventory_hostname]) }}"
 
-# fixedip-ipam server config
-fixedip_ipam_enabled: false
-fixedip_ipam_server_service: ""
-
 # fixedip-ipam service port
 fixedip_ipam_server_port: 9109
 fixedip_ipam_webhook_port: 9110
