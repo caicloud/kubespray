@@ -356,7 +356,7 @@ fixedip_ipam_webhook_port: 9110
 kube_controller_terminated_pod_gc_threshold: 1000
 kube_api_runtime_config: ["extensions/v1beta1/networkpolicies","batch/v2alpha1"]
 audit_log_maxbackups: 10
-kubelet_rotate_server_certificates: true
+#kubelet_rotate_server_certificates: true
 kube_feature_gates: ["RotateKubeletServerCertificate=true"]
 ## Support parameters to be passed to kubelet via kubelet-config.yaml
 kubelet_config_extra_args: {
