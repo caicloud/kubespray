@@ -226,3 +226,4 @@
     --group=system:serviceaccounts
   when:
     - inventory_hostname in groups['kube-master'][0]
+  ignore_errors: true
