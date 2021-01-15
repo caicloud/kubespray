@@ -15,12 +15,11 @@ data:
   # essential.
   typha_service_name: "calico-typha"
 {% endif %}
-{% if calico_network_backend is defined %}
-  cluster_type: "kubespray"
   calico_backend: "{{ calico_network_backend }}"
+{% if calico_network_backend == "vxlan" or calico_ipip_mode == "Always" %}
+  cluster_type: "k8s"
 {% else %}
   cluster_type: "k8s,bgp"
-  calico_backend: "bird"
 {% endif %}
 {% if inventory_hostname in groups['k8s-cluster'] and peer_with_router|default(false) %}
   as: "{{ local_as|default(global_as_num) }}"
