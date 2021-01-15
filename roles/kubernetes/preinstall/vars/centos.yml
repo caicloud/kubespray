@@ -4,7 +4,18 @@ required_pkgs:
   - device-mapper-libs
   - nss
   - conntrack
+  - ntpdate
+  - chrony
 
 container_os_required_pkgs:
   - lvm2
+  - tcpdump
+  - ca-certificates
+  - vim
+  - bash-completion
+  - wget
+  - iotop
+  - sysstat
+  - lsof
+  - telnet
   - "{{ ( support_gluster_volume | bool ) | ternary('glusterfs-cli-{{ glusterfs_version }}', 'vim') }}"

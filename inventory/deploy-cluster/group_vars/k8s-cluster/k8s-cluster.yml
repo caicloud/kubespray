@@ -396,3 +396,10 @@ loadbalancer_apiserver_cpu_requests: "25m"
 loadbalancer_apiserver_memory_requests: "32Mi"
 loadbalancer_apiserver_cpu_limits: "50m"
 loadbalancer_apiserver_memory_limits: "100Mi"
+
+# NTP variable
+# ntp_server_list:
+#   - 1.2.3.4
+#   - 1.2.3.5
+ntp_server_list:
+  - "{{ image_registry_ip }}"
