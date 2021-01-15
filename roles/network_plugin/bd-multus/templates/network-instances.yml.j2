@@ -9,7 +9,7 @@ spec:
   type: "calico"
   isDefaultNetwork: true
   isFixedIP: {{ fixedip_enabled | bool }}
-  ipRecycleTimeout: {{ recycle_enabled | ternary(0, -1) }}
+  ipRecycleTimeout: {{ (recycle_enabled | bool) | ternary(0, -1) }}
   cni:
 {% if kube_network_plugin == "bd-calico" %}
     calico:
