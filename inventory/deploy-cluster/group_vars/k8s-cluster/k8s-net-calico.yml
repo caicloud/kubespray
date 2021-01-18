@@ -80,7 +80,7 @@ calico_network_backend: "{{ calico_backend }}"
 
 # IP in IP and VXLAN is mutualy exclusive modes.
 # set IP in IP encapsulation mode: "Always", "CrossSubnet", "Never"
-calico_ipip_mode: "{% if calico_backend == 'bird' %}Always{% else %}Never{% endif %}"
+calico_ipip_mode: "Never"
 
 # set VXLAN encapsulation mode: "Always", "CrossSubnet", "Never"
 calico_vxlan_mode: "{% if calico_backend == 'vxlan' %}Always{% else %}Never{% endif %}"
