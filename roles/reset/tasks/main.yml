@@ -380,3 +380,4 @@
     name: containerd
     state: restarted
   when: container_manager == "containerd" and containerd_version is version('1.4', '>=')
+  ignore_errors: True
