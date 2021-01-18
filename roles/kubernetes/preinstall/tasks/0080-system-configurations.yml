@@ -107,8 +107,4 @@
     - { name: net.ipv4.conf.default.arp_filter, value: 1 }
     - { name: fs.may_detach_mounts, value: 1 }
     - { name: kernel.softlockup_panic, value: 1 }
-    - { name: net.netfilter.nf_conntrack_tcp_timeout_close_wait, value: 3600 }
-    - { name: net.netfilter.nf_conntrack_tcp_timeout_fin_wait, value: 1 }
-    - { name: net.netfilter.nf_conntrack_tcp_timeout_time_wait, value: 1 }
-    - { name: net.netfilter.nf_conntrack_tcp_timeout_established, value: 86400 }
   when: containeros_cluster|bool
