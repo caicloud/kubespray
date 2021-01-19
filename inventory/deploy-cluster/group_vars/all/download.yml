@@ -84,7 +84,7 @@ bridge_vlan_image_repo: "{{ release_image_repo }}/bridge-vlan"
 
 network_agent_image_repo: "{{ release_image_repo }}/network-agent"
 
-keepalived_vip_enabled: "{% if deploy_control_cluster %}false{% else %}true{% endif %}"
+keepalived_vip_enabled: "{% if deploy_control_cluster|bool %}false{% else %}true{% endif %}"
 keepalived_vip_repo: "{{ release_image_repo }}/keepalived"
 keepalived_vip_tag: "v0.1.0"
 
