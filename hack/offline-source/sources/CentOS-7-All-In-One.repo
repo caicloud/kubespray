@@ -8,3 +8,10 @@ baseurl=__download_url__/centos/7
 gpgcheck=1
 enabled=1
 gpgkey=__download_url__/centos/7/RPM-GPG-KEY-CentOS-7
+
+[Glusterfs-Mirror]
+name=Glusterfs Mirror Repository
+baseurl=__download_url__/gluster/centos/7/
+enabled=1
+gpgcheck=1
+gpgkey=__download_url__/gluster/centos/7/RPM-GPG-KEY-CentOS-SIG-Storage

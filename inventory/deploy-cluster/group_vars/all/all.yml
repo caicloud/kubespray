@@ -121,5 +121,5 @@ cluster_deploy_job_version: ""
 create_mongo_db_path: true
 
 # Whether gluster volume support
-support_gluster_volume: false
-glusterfs_version: "7.x"
+support_gluster_volume: true
+glusterfs_version: "7.4"
