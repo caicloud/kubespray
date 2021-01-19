@@ -108,3 +108,38 @@
     - { name: fs.may_detach_mounts, value: 1 }
     - { name: kernel.softlockup_panic, value: 1 }
   when: containeros_cluster|bool
+
+- name: Update the chrony config file
+  set_fact:
+    chrony_service_name: "chronyd"
+    chrony_config_file: "/etc/chrony.conf"
+  when:
+    - ansible_os_family in ["CentOS","RedHat"]
+    - network_time_sync|bool
+
+- name: Sync chrony template
+  template:
+    src: chrony.conf.j2
+    dest: "{{ chrony_config_file }}"
+  when:
+    - ansible_os_family in ["CentOS","RedHat"]
+    - network_time_sync|bool
+
+- name: Use nptdate sync the time
+  shell: "/usr/sbin/ntpdate -u -s {{ ntp_server_list[0] }} && hwclock --systohc"
+  register: ntpdate_result
+  until: ntpdate_result is success
+  retries: 3
+  delay: 5
+  when:
+    - ansible_os_family in ["CentOS","RedHat"]
+    - network_time_sync|bool
+
+- name: Enable chrony to start on boot
+  service:
+    name: "{{ chrony_service_name }}"
+    enabled: yes
+    state: restarted
+  when:
+    - ansible_os_family in ["CentOS","RedHat"]
+    - network_time_sync|bool
