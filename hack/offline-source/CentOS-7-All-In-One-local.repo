@@ -14,3 +14,10 @@ name=Containerd
 baseurl=file://__BASE__/runtime/containerd
 gpgcheck=0
 enabled=1
+
+[Glusterfs-Mirror]
+name=Glusterfs Mirror Repository
+baseurl=file://__BASE__/gluster/centos/7/
+enabled=1
+gpgcheck=1
+gpgkey=file://__BASE__/gluster/centos/7/RPM-GPG-KEY-CentOS-SIG-Storage
