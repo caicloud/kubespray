@@ -17,4 +17,4 @@
     state: directory
   when:
     - create_mongo_db_path|bool
-    - deploy_control_cluster
+    - deploy_control_cluster|bool

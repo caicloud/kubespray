@@ -118,6 +118,6 @@
   when:
     - not dns_late
     - ansible_distribution in ["CentOS","RedHat"]
-    - containeros_cluster
+    - containeros_cluster|bool
   tags:
     - bootstrap-os
