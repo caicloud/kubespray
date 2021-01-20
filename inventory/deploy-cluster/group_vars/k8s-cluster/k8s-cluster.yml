@@ -354,7 +354,7 @@ fixedip_ipam_webhook_port: 9110
 
 ### CIS modify
 kube_controller_terminated_pod_gc_threshold: 1000
-kube_api_runtime_config: ["extensions/v1beta1/networkpolicies","batch/v2alpha1"]
+kube_api_runtime_config: ["extensions/v1beta1/networkpolicies=false","extensions/v1beta1/ingresses=false","networking.k8s.io/v1=true","batch/v2alpha1"]
 audit_log_maxbackups: 10
 #kubelet_rotate_server_certificates: true
 kube_feature_gates: ["RotateKubeletServerCertificate=true"]
