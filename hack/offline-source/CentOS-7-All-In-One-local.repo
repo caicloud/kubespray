@@ -21,3 +21,9 @@ baseurl=file://__BASE__/gluster/centos/7/
 enabled=1
 gpgcheck=1
 gpgkey=file://__BASE__/gluster/centos/7/RPM-GPG-KEY-CentOS-SIG-Storage
+
+[CentOS-7-Extras]
+name=CentOS 7 Full Mirror Repository
+baseurl=file://__BASE__/extras/centos/7/
+enabled=1
+gpgcheck=0

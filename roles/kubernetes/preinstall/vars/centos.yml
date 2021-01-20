@@ -19,3 +19,25 @@ container_os_required_pkgs:
   - lsof
   - telnet
   - "{{ ( support_gluster_volume | bool ) | ternary('glusterfs-cli-{{ glusterfs_version }}', 'vim') }}"
+  - dstat
+  - perf
+  - blktrace
+  - strace
+  - iftop
+  - mtr
+  - traceroute
+  - iptables
+  - ethtool
+  - net-tools
+  - bind-utils
+  - ipset
+  - ipvsadm
+  - iputils
+  - net-tools
+  - vim
+  - bash-completion
+  - wget
+  - rsync
+  - socat
+  - ca-certificates
+
