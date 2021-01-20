@@ -3,6 +3,8 @@
   file:
     name: "{{ self_hosted_config_dir }}"
     state: directory
+  when:
+    - inventory_hostname in groups['kube-master']
 
 - name: Generate COS namespaces yaml
   template:
@@ -10,6 +12,7 @@
     dest: "{{ self_hosted_config_dir }}/cos-system-ns.yml"
   when:
     - cos_running_namespaces not in ["default", "kube-system", "kube-node-lease", "kube-public"]
+    - inventory_hostname in groups['kube-master']
 
 - name: Create COS namespaces
   kube:
@@ -30,16 +33,28 @@
 # Add label on master node
 - name: Add label on master node
   shell: |
-    kubectl label node {{ inventory_hostname }} {{ item }}
+    {{ bin_dir }}/kubectl label node {{ inventory_hostname }} {{ item }} --overwrite
   with_items:
     - node-role.release.containeros.dev/primary-master=true
-    - node-role.release.containeros.dev/primary-etcd=true
   register: label_status
   until: label_status.rc == 0
   retries: 30
   delay: 10
   when:
     - inventory_hostname in groups['kube-master'][0]
+
+- name: Add label on master node
+  shell: |
+    {{ bin_dir }}/kubectl label node {{ inventory_hostname }} {{ item }} --overwrite
+  with_items:
+    - node-role.release.containeros.dev/primary-etcd=true
+  delegate_to: "{{ groups['kube-master'][0] }}"
+  register: label_status
+  until: label_status.rc == 0
+  retries: 30
+  delay: 10
+  when:
+    - inventory_hostname in groups['etcd'][0]
 
 # Ensure self-hosted config dir exist
 - name: Ensure self-hosted config dir exist
@@ -49,6 +64,8 @@
     owner: root
     group: root
     mode: 0o755
+  when:
+    - inventory_hostname in groups['kube-master']
 
 # Read ssh certs and create secret
 - name: Read ssh private key
@@ -80,7 +97,9 @@
   copy:
     src: "{{ image_registry_signed_certificate }}"
     dest: "{{ kube_config_dir }}/registry-ca.crt"
-  when: image_registry_ca_self_sign
+  when: 
+    - image_registry_ca_self_sign
+    - inventory_hostname in groups['kube-master']
 
 - name: Create secret for image registry ca cert
   shell: |
@@ -194,6 +213,8 @@
     cat {{ local_vip_kubeconfig_file }} | base64 | tr -d "\n"
   delegate_to: localhost
   register: local_kubeconfig_base64
+  when:
+    - inventory_hostname in groups['kube-master']
 
 - name: Generate cluster crd
   template:
@@ -216,6 +237,36 @@
   when:
     - not deploy_control_cluster|bool
     - inventory_hostname in groups['kube-master'][0]
+
+- name: Fetch etcd certs
+  fetch:
+    src: "{{ etcd_cert_dir }}/{{ item.src }}"
+    dest: "/tmp/{{ item.dest }}"
+    flat: true
+    validate_checksum: no
+  with_items:
+    - src: "admin-{{ inventory_hostname }}.pem"
+      dest: "admin-{{ groups['kube-master'][0] }}.pem"
+    - src: "admin-{{ inventory_hostname }}-key.pem"
+      dest: "admin-{{ groups['kube-master'][0] }}-key.pem"
+  when:
+    - inventory_hostname in groups['etcd'][0]
+    - inventory_hostname not in groups['kube-master']
+
+- name: Sync etcd certs
+  copy:
+    src: "/tmp/{{ item.dest }}"
+    dest: "{{ etcd_cert_dir }}/{{ item.dest }}"
+    force: true
+  with_items:
+    - src: "admin-{{ inventory_hostname }}.pem"
+      dest: "admin-{{ groups['kube-master'][0] }}.pem"
+    - src: "admin-{{ inventory_hostname }}-key.pem"
+      dest: "admin-{{ groups['kube-master'][0] }}-key.pem"
+  delegate_to: "{{ groups['kube-master'][0] }}"
+  when:
+    - inventory_hostname in groups['etcd'][0]
+    - inventory_hostname not in groups['kube-master']
 
 - name: Create etcd tls secret
   shell: |
