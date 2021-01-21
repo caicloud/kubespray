@@ -28,8 +28,6 @@ ansible_ssh_pass=
 
 [all]
 
-[bastion]
-
 [kube-master]
 
 [etcd]
