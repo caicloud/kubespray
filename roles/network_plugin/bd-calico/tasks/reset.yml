@@ -28,6 +28,10 @@
   ignore_errors: True
   when: tunl0.stat.exists
 
+- name: reset | remove pod cidr blackhole
+  shell: "ip route | grep '^blackhole' | grep -F -w '{{ kube_pods_subnet }}' | sed -e 's/^blackhole/ip route del/' | sh -x"
+  ignore_errors: True
+
 - name: reset | get remaining routes set by vxlan
   command: ip route show dev vxlan.calico
   changed_when: false
