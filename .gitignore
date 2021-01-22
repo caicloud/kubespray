@@ -98,3 +98,7 @@ target/
 # virtualenv
 venv/
 ENV/
+
+# make lint
+linterr.txt
+stderr.txt
