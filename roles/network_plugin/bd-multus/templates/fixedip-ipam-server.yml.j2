@@ -36,6 +36,7 @@ spec:
         - args:
             - --port={{ fixedip_ipam_server_port }}
             - --webhook-port={{ fixedip_ipam_webhook_port }}
+            - -v=2
           image: {{ fixedip_ipam_server_image_repo }}:{{ fixedip_ipam_server_image_tag }}
           livenessProbe:
             failureThreshold: 3
