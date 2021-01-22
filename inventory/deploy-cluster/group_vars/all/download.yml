@@ -22,14 +22,14 @@ release_image_repo: "{{ image_registry_domain }}/{{ image_registry_project_relea
 # Image version
 kube_version: v1.19.6
 calico_version: "v3.17.0"
-multus_version: "v3.6.2-rc.1"
+multus_version: "v3.6.2"
 pod_infra_version: "3.2"
 nginx_image_tag: 1.19
 dnsautoscaler_version: 1.8.1
 coredns_version: "1.6.7"
-fixedip_ipam_version: "v1.5.0-rc.1"
-bridge_vlan_image_tag: "v1.5.0-rc.1"
-network_agent_image_tag: "v1.5.0-rc.1"
+fixedip_ipam_version: "v1.5.0"
+bridge_vlan_image_tag: "v1.5.0"
+network_agent_image_tag: "v1.5.0"
 yq_version: "v4.2.1"
 
 ## Download config
