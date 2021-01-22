@@ -202,6 +202,7 @@ spec:
                                 ansible -i /jenkins/ansible/inventory cargo -m shell -a "cp /kubespray/config/inventory ${PACKING_DIR}/${PACKAGE_NAME}/inventory.sample"
                                 ansible -i /jenkins/ansible/inventory cargo -m shell -a "cp /kubespray/config/env.yml ${PACKING_DIR}/${PACKAGE_NAME}/env.yml.sample"
                                 ansible -i /jenkins/ansible/inventory cargo -m shell -a "cp /kubespray/hack/k8s-installer/install.sh ${PACKING_DIR}/${PACKAGE_NAME}"
+                                ansible -i /jenkins/ansible/inventory cargo -m shell -a "cp -rf /kubespray/hack/k8s-installer/tools ${PACKING_DIR}/${PACKAGE_NAME}"
                                 ansible -i /jenkins/ansible/inventory cargo -m shell -a "cp -rf ${TOOLS_DIR} ${PACKING_DIR}/${PACKAGE_NAME}"
                             """
                         }
