@@ -20,15 +20,16 @@ DEPLOY_CONTAINER_NAME="cluster-deploy-job"
 IMAGE_TAG=""
 TOOLS_DIR="${DEPLOY_ROOT}/tools"
 IMGAE_SYNC_DIR="${DEPLOY_ROOT}/skopeo"
-REGISTRY_AUTH_USERNAME=`cat env.yml | grep image_registry_username | awk '{print $2}' | sed 's#"##g'`
-REGISTRY_AUTH_PASSWORD=`cat env.yml | grep image_registry_password | awk '{print $2}' | sed 's#"##g'`
+REGISTRY_CFG_USERNAME=`cat env.yml | grep image_registry_username | awk '{print $2}' | sed 's#"##g'`
+CARGO_CFG_PASSWORD=`cat env.yml | grep image_registry_password | awk '{print $2}' | sed 's#"##g'`
+NEED_REGISTRY_CERTS=`cat env.yml | grep image_registry_ca_self_sign | awk '{print $2}' | sed 's#"##g'`
 
 mkdir -p ${CONFIG_DIR}/registry_ca_cert
 
 # source cargo env
 if [ -f ../.install-env.sh ];then
   source ../.install-env.sh
-elif [ -f ./registry_ca_cert/registry-ca.crt ]; then
+elif [ -f ./registry_ca_cert/registry-ca.crt ] || [ ${CARGO_CFG_CA_PATH} == "true" ]; then
   CARGO_CFG_CA_PATH="registry_ca_cert/registry-ca.crt"
   CARGO_CFG_DOMAIN=`cat env.yml | grep image_registry_domain | awk '{print $2}' | sed 's#"##g'`
   CARGO_CFG_IP=`cat env.yml | grep image_registry_ip | awk '{print $2}' | sed 's#"##g'`
@@ -58,13 +59,17 @@ fi
 cp inventory ${CONFIG_DIR}
 cp env.yml ${CONFIG_DIR}
 cp -r ${SSH_CERT_DIR} ${CONFIG_DIR}
-cp ${CARGO_CFG_CA_PATH} ${CONFIG_DIR}/registry_ca_cert/registry-ca.crt
+if [[ ${NEED_REGISTRY_CERTS} == "true" ]]; then
+  cp ${CARGO_CFG_CA_PATH} ${CONFIG_DIR}/registry_ca_cert/registry-ca.crt
+fi
 
 # syncImages sync the images to registry
 function sync_images() {
   echo -e "$YELLOW_COL load images $NORMAL_COL"
   rm -rf "${IMGAE_SYNC_DIR}" || mkdir -p ${IMGAE_SYNC_DIR}
-  ${TOOLS_DIR}/skopeo login ${CARGO_CFG_DOMAIN} -u "${REGISTRY_AUTH_USERNAME}" -p "${REGISTRY_AUTH_PASSWORD}"
+  if [[ ${REGISTRY_CFG_USERNAME} == "admin" ]]; then
+    ${TOOLS_DIR}/skopeo login ${CARGO_CFG_DOMAIN} -u "${REGISTRY_CFG_USERNAME}" -p "${CARGO_CFG_PASSWORD}"
+  fi
   tar -xf images.tar.gz
   BLOB_DIR="docker/registry/v2/blobs/sha256"
   REPO_DIR="docker/registry/v2/repositories"
@@ -99,8 +104,15 @@ function load_deploy_image() {
 
 function push_deploy_image() {
   IMAGE_NAME=`echo ${IMAGE_FALL_NAME} | awk -F '/library/' '{print $NF}'`
-  ctr i tag ${IMAGE_FALL_NAME} ${CARGO_CFG_DOMAIN}/release/${IMAGE_NAME} || true
-  ctr i push -u ${REGISTRY_AUTH_USERNAME}:${REGISTRY_AUTH_PASSWORD} ${CARGO_CFG_DOMAIN}/release/${IMAGE_NAME}
+  if ctr i ls | grep -Eqi "${CARGO_CFG_DOMAIN}/release/${IMAGE_NAME}"; then
+    ctr i rm ${CARGO_CFG_DOMAIN}/release/${IMAGE_NAME}
+  fi
+  ctr i tag ${IMAGE_FALL_NAME} ${CARGO_CFG_DOMAIN}/release/${IMAGE_NAME}
+  options=""
+  if [[ ${REGISTRY_CFG_USERNAME} == "admin" ]]; then
+    options="-u ${REGISTRY_CFG_USERNAME}:${CARGO_CFG_PASSWORD}"
+  fi
+  ctr i push ${options} ${CARGO_CFG_DOMAIN}/release/${IMAGE_NAME}
 }
 
 function cluster_deploy() {
@@ -121,9 +133,15 @@ function cluster_deploy() {
 case $input in
   install )
     echo -e "$GREEN_COL start deploy kubernetes cluster $NORMAL_COL"
-    sync_images
+    is_sync_image="sync_image"
+    if [[ $# -eq 2 ]]; then
+      is_sync_image="$2"
+    fi
     load_deploy_image
-    push_deploy_image
+    if [[ ${is_sync_image} == "sync_image" ]]; then
+      sync_images
+      push_deploy_image
+    fi
     COMMAND="bash run.sh install"
     cluster_deploy "${COMMAND}"
     # Copy kubeconfig
