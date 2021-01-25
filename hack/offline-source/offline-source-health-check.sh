@@ -13,25 +13,26 @@ NORMAL_COL="\\033[0;39m"
 # Source offline-source variable
 WORK_HOME=$1
 source ${WORK_HOME}/offline-source-variable.conf
+LOG_FILE="${LOG_PATH}/health_check_file_`date +%y-%m-%d`.log"
 
 function print_log() {
   log_type=$1
   log_message=$2
   case ${log_type} in
     info )
-      echo -e "${GREEN_COL} `date +%y/%m/%d-%H:%M:%S` ${log_message} ${NORMAL_COL}"
+      echo -e "${GREEN_COL} `date +%y/%m/%d-%H:%M:%S` ${log_message} ${NORMAL_COL}" >> ${LOG_FILE}
       ;;
     warning )
-      echo -e "${YELLOW_COL} `date +%y/%m/%d-%H:%M:%S` ${log_message} ${NORMAL_COL}"
+      echo -e "${YELLOW_COL} `date +%y/%m/%d-%H:%M:%S` ${log_message} ${NORMAL_COL}" >> ${LOG_FILE}
       ;;
     error )
-      echo -e "${RED_COL} `date +%y/%m/%d-%H:%M:%S` ${log_message} ${NORMAL_COL}"
+      echo -e "${RED_COL} `date +%y/%m/%d-%H:%M:%S` ${log_message} ${NORMAL_COL}" >> ${LOG_FILE}
       ;;
   esac
 }
 
 function log_clean() {
-  find ${LOG_PATH} -mtime +30 -name "health_check_file_.*.log" -exec rm -rf {} \;
+  find ${LOG_PATH} -mtime +30 -name "health_check_file_.*.log" -exec rm -rf {} \; || true
 }
 
 function restart_offline_source() {
@@ -42,7 +43,7 @@ function restart_offline_source() {
 
   # Start infra-nginx
   if `ctr tasks ls | grep -Eqi ${PACKAGE_SOURCE_CONTAINERD_NAME}`; then
-    ctr tasks kill ${PACKAGE_SOURCE_CONTAINERD_NAME} >> /dev/null 2>&1 || true
+    ctr tasks kill --signal SIGKILL ${PACKAGE_SOURCE_CONTAINERD_NAME} >> /dev/null 2>&1 || true
     ctr tasks rm ${PACKAGE_SOURCE_CONTAINERD_NAME} >> /dev/null 2>&1 || true
   fi
   if `ctr snapshot ls | grep -Eqi ${PACKAGE_SOURCE_CONTAINERD_NAME}`; then
@@ -78,3 +79,5 @@ if health_check; then
 else
   print_log error "Health check error, Please check !"
 fi
+
+log_clean

@@ -28,7 +28,6 @@ CENTOS_MIRROR_FILE_NAME="CentOS-${SYSTEM_VERSION_ID}-All-In-One-local.repo"
 CHECK_URL="http://localhost:3142/centos/7/repodata/repomd.xml"
 HEALTH_CHECK_DIR="${COMMON_ROOT}/health-check"
 LOG_PATH="${HEALTH_CHECK_DIR}/health_check_log"
-LOG_FILE="${LOG_PATH}/health_check_file_`date +%y-%m-%d`.log"
 
 echo -e "$GREEN_COL Check system version $NORMAL_COL"
 # get system version
@@ -100,7 +99,7 @@ CABIN_NGINX_IMAGE=`find ${PACKAGE_SOURCE_ROOT}/resources/images/save -name '*.ta
 
 # Start infra-nginx
 if `ctr tasks ls | grep -Eqi ${PACKAGE_SOURCE_CONTAINERD_NAME}`; then
-  ctr tasks kill ${PACKAGE_SOURCE_CONTAINERD_NAME} >> /dev/null 2>&1 || true
+  ctr tasks kill --signal SIGKILL ${PACKAGE_SOURCE_CONTAINERD_NAME} >> /dev/null 2>&1 || true
   ctr tasks rm ${PACKAGE_SOURCE_CONTAINERD_NAME} >> /dev/null 2>&1 || true
 fi
 if `ctr snapshot ls | grep -Eqi ${PACKAGE_SOURCE_CONTAINERD_NAME}`; then
@@ -130,7 +129,7 @@ function health_check_config() {
 
   # set crontab
   crontab -l > conf
-  crontab_config="* * * * * bash ${HEALTH_CHECK_DIR}/offline-source-health-check.sh ${HEALTH_CHECK_DIR} >> ${LOG_FILE}"
+  crontab_config="* * * * * bash ${HEALTH_CHECK_DIR}/offline-source-health-check.sh ${HEALTH_CHECK_DIR}"
   if ! cat conf | grep -Eqi "${crontab_config}"; then
     echo "${crontab_config}" >> conf
   fi
