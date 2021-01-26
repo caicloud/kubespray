@@ -83,6 +83,7 @@
     state: present
     reload: yes
   with_items:
+    - { name: user.max_user_namespaces, value: 28633 }                 # cargo need it, Please don't remove
     - { name: vm.swappiness, value: 0 }
     - { name: vm.overcommit_memory, value: 1 }
     - { name: vm.max_map_count, value: 262144 }
