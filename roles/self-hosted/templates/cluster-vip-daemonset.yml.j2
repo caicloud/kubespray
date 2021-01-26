@@ -56,6 +56,13 @@ spec:
           - /etc/keepalived/keepalived-$(NODE_NAME).conf
           - --dont-fork
           - --log-console
+          resources:
+            limits:
+              cpu: {{ cluster_vip_cpu_limit }}
+              memory: {{ cluster_vip_memory_limit }}
+            requests:
+              cpu: {{ cluster_vip_cpu_requests }}
+              memory: {{ cluster_vip_memory_requests }}
       volumes:
         - name: keepalived-config
           configMap:
