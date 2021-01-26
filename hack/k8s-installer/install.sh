@@ -22,6 +22,8 @@ TOOLS_DIR="${DEPLOY_ROOT}/tools"
 IMGAE_SYNC_DIR="${DEPLOY_ROOT}/skopeo"
 REGISTRY_CFG_USERNAME=`cat env.yml | grep image_registry_username | awk '{print $2}' | sed 's#"##g'`
 CARGO_CFG_PASSWORD=`cat env.yml | grep image_registry_password | awk '{print $2}' | sed 's#"##g'`
+CARGO_CFG_DOMAIN=`cat env.yml | grep image_registry_domain | awk '{print $2}' | sed 's#"##g'`
+CARGO_CFG_IP=`cat env.yml | grep image_registry_ip | awk '{print $2}' | sed 's#"##g'`
 NEED_REGISTRY_CERTS=`cat env.yml | grep image_registry_ca_self_sign | awk '{print $2}' | sed 's#"##g'`
 
 mkdir -p ${CONFIG_DIR}/registry_ca_cert
@@ -29,16 +31,16 @@ mkdir -p ${CONFIG_DIR}/registry_ca_cert
 # source cargo env
 if [ -f ../.install-env.sh ];then
   source ../.install-env.sh
-elif [ -f ./registry_ca_cert/registry-ca.crt ] || [ ${CARGO_CFG_CA_PATH} == "true" ]; then
-  CARGO_CFG_CA_PATH="registry_ca_cert/registry-ca.crt"
-  CARGO_CFG_DOMAIN=`cat env.yml | grep image_registry_domain | awk '{print $2}' | sed 's#"##g'`
-  CARGO_CFG_IP=`cat env.yml | grep image_registry_ip | awk '{print $2}' | sed 's#"##g'`
-  if ! `cat /etc/hosts | grep -Eqi ${CARGO_CFG_DOMAIN}`; then
-    echo "${CARGO_CFG_IP} ${CARGO_CFG_DOMAIN}" >> /etc/hosts
+elif [ ${NEED_REGISTRY_CERTS} == "true" ]; then
+  if [ -f ./registry_ca_cert/registry-ca.crt ]; then
+    CARGO_CFG_CA_PATH="registry_ca_cert/registry-ca.crt"
+  else
+    echo -e "$RED_COL Cargo env file or registry ca certificate not exist. Please check $NORMAL_COL"
+    exit 1
   fi
-else
-  echo -e "$RED_COL Cargo env file or registry ca certificate not exist. Please check $NORMAL_COL"
-  exit 1
+fi
+if ! `cat /etc/hosts | grep -Eqi ${CARGO_CFG_DOMAIN}`; then
+  echo "${CARGO_CFG_IP} ${CARGO_CFG_DOMAIN}" >> /etc/hosts
 fi
 
 # Uniform certificate authority
