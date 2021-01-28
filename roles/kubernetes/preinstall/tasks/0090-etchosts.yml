@@ -33,6 +33,7 @@
     backup: yes
     unsafe_writes: yes
     marker: "# image registry server {mark}"
+  when: registry_host_config | bool
 
 - name: Hosts | populate kubernetes loadbalancer address into hosts file
   lineinfile:

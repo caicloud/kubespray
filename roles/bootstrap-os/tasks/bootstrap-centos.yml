@@ -160,9 +160,11 @@
     - containeros_cluster|bool
 
 - name: Regenerate the kernel initramfs
-  shell: dracut --force
+  shell: timeout -k 10s 60s dracut --force
+  register: dracut_status
   when:
     - containeros_cluster|bool
+  ignore_errors: true
 
 - name: Remove nouveau kernel module
   shell: |
@@ -182,4 +184,4 @@
     that: mod_nouveau_status.rc == 0
     fail_msg: "Remove nouveau kernel module failed, Please reboot host system."
   when:
-    - containeros_cluster | bool
+    - ( containeros_cluster | bool ) or ( dracut_status | bool )
