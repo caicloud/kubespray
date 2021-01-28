@@ -57,3 +57,6 @@ yum_repo_dir: /etc/yum.repos.d
 # NTP variable
 ntp_server_list: []
 network_time_sync: true
+
+# add registry config to /etc/hosts file
+registry_host_config: true
