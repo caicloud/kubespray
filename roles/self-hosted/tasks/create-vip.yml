@@ -2,6 +2,10 @@
   shell: ip a | grep {{ ip | default(fallback_ips[inventory_hostname]) }} | awk '{ print $NF }'
   register: network_interface
 
+- name: Setup keepalived auth pass
+  set_fact:
+    cluster_vip_auth_pass: "{{ lookup('password', '/dev/null length=5 chars=ascii_letters') }}"
+
 - name: Create VIP | Generate keepalived config
   template:
     src: "{{ item }}.j2"

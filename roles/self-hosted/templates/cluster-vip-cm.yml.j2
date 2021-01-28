@@ -11,7 +11,7 @@ data:
     }
 
     vrrp_instance VI_1 {
-{% if inventory_hostname in groups['kube-master'][0] %}
+{% if host in groups['kube-master'][0] %}
       state MASTER
       priority 150
 {% else %}
@@ -28,7 +28,7 @@ data:
       }
       authentication {
         auth_type PASS
-        auth_pass {{ lookup('password', '/dev/null length=5 chars=ascii_letters') }}
+        auth_pass {{ cluster_vip_auth_pass }}
       }
       virtual_ipaddress {
         {{ cluster_vip }}

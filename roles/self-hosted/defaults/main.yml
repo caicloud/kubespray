@@ -32,3 +32,8 @@ cluster_identity_name: "kubernetes-stack"
 etcd_cert_dir: "/etc/ssl/etcd/ssl"
 
 cluster_deploy_job_version: ""
+
+cluster_vip_cpu_limit: 200m
+cluster_vip_memory_limit: 400Mi
+cluster_vip_cpu_requests: 100m
+cluster_vip_memory_requests: 200Mi
