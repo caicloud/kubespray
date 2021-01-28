@@ -26,6 +26,12 @@ CARGO_CFG_DOMAIN=`cat env.yml | grep image_registry_domain | awk '{print $2}' | 
 CARGO_CFG_IP=`cat env.yml | grep image_registry_ip | awk '{print $2}' | sed 's#"##g'`
 NEED_REGISTRY_CERTS=`cat env.yml | grep image_registry_ca_self_sign | awk '{print $2}' | sed 's#"##g'`
 
+if cat env.yml | grep containeros_cluster; then
+  IS_CONTAINEROS_CLUSTER=`cat env.yml | grep containeros_cluster | awk '{print $2}' | sed 's#"##g'`
+else
+  IS_CONTAINEROS_CLUSTER="true"
+fi
+
 mkdir -p ${CONFIG_DIR}/registry_ca_cert
 
 # source cargo env
@@ -147,7 +153,9 @@ case $input in
     COMMAND="bash run.sh install"
     cluster_deploy "${COMMAND}"
     # Copy kubeconfig
-    cp ${CONFIG_DIR}/kubectl.kubeconfig.local ../.kubectl.kubeconfig
+    if [[ ${IS_CONTAINEROS_CLUSTER} == "true" ]]; then
+      cp ${CONFIG_DIR}/kubectl.kubeconfig.local ../.kubectl.kubeconfig
+    fi
     ;;
   remove )
     echo -e "$GREEN_COL remove kubernetes cluster and all platform data $NORMAL_COL"
