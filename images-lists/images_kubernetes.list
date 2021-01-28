@@ -7,8 +7,8 @@ release/kube-proxy:v1.19.6
 release/kube-controller-manager:v1.19.6
 release/kube-apiserver:v1.19.6
 release/keepalived:v0.1.0
-release/fixedip-ipam-server:v1.5.0
-release/fixedip-ipam-client:v1.5.0
+release/fixedip-ipam-server:v1.5.1
+release/fixedip-ipam-client:v1.5.1
 release/coredns-coredns:1.6.7
 release/cluster-proportional-autoscaler-amd64:1.8.1
 release/calico-node:v3.17.0
