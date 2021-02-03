@@ -60,3 +60,7 @@ network_time_sync: true
 
 # add registry config to /etc/hosts file
 registry_host_config: true
+
+
+# number of times package install task should be retried
+pkg_install_retries: 4
