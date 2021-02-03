@@ -18,7 +18,8 @@ container_os_required_pkgs:
   - sysstat
   - lsof
   - telnet
-  - "{{ ( support_gluster_volume | bool ) | ternary('glusterfs-cli-7.4', 'vim') }}"
+  - "{{ ( support_gluster_volume | bool ) | ternary('glusterfs-cli', 'vim') }}"
+  - "{{ ( support_gluster_volume | bool ) | ternary('glusterfs-client', 'vim') }}"
   - dstat
   - perf
   - blktrace
